@@ -2,10 +2,10 @@
 import { defineComponent, onMounted, ref } from "vue"
 import router from "@/router"
 import UseLogin from "./UseLogin"
-
+import { notify } from "@kyvg/vue3-notification";
 export default defineComponent ({
   setup() {
-    const { login } = UseLogin();
+    const { login, loginLoading } = UseLogin();
     const username = ref("");
     const password = ref("");
     const usernameError = ref("");
@@ -23,12 +23,22 @@ export default defineComponent ({
         'password' : password.value,
         'active' : 1,
       };
-      login(values).then(function(response) {
-        localStorage.setItem('token', response?.data?.data?.token);
-        router.push({ name : 'Admin' });
-      }).catch(function(error) {
-        alert(error?.response?.data?.message);
-      })
+      if (username.value && password.value) {
+        login(values)?.then(function(response) {
+          loginLoading.value = true;
+          localStorage.setItem('token', response?.data?.data?.token);
+          router.push({ name : 'Admin' });
+        }).catch(function(error) {
+          loginLoading.value = false;
+          notify({
+            title: error?.response?.data?.message,
+            type: "warn"
+          });
+        }).finally(function() {
+          loginLoading.value = false;
+        })
+      }
+      
     };
     const checkUsername = () => {
       if (!username.value) {
@@ -50,6 +60,7 @@ export default defineComponent ({
         router.push({name : 'Admin'})
       }
     })
+
     return {
       username,
       password,
@@ -58,7 +69,8 @@ export default defineComponent ({
       resetForm,
       submitForm,
       checkUsername,
-      checkPassword
+      checkPassword,
+      loginLoading
     }
   }
 })
@@ -90,7 +102,12 @@ export default defineComponent ({
               <button 
                 type="button"
                 class="btn btn-primary btn-sm mr-1"
-                @click="submitForm">Đăng nhập</button>
+                @click="submitForm"
+                :disabled="loginLoading"  
+              >
+                <span v-if="loginLoading" class="spinner-border spinner-border-sm"/>
+                Đăng nhập
+              </button>
               <button
                 type="reset"
                 class="btn btn-secondary btn-sm"

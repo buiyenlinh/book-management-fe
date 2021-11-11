@@ -13,10 +13,13 @@ interface responseData {
   message: string
 }
 export default function UseLogin() {
+  const loginLoading = ref(false);
   const login = (params : loginData) => {
+    loginLoading.value = true;
     return API.post<responseData>('auth/login', params);
   }
   return {
-    login
+    login,
+    loginLoading
   }
 }
