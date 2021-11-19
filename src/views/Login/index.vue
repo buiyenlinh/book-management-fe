@@ -31,7 +31,7 @@ export default defineComponent ({
         }).catch(function(error) {
           loginLoading.value = false;
           notify({
-            title: error?.response?.data?.message,
+            title: error?.response?.data?.errors,
             type: "warn"
           });
         }).finally(function() {
