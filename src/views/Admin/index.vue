@@ -1,5 +1,8 @@
 <script lang="ts">
-import { defineComponent, reactive } from 'vue'
+import { defineComponent, onMounted, reactive } from 'vue';
+import router from "@/router"
+import API from "../../services"
+import { useStore } from "vuex"
 
 export default defineComponent({
   setup() {
@@ -10,11 +13,25 @@ export default defineComponent({
         icon: "",
       },
       {
-        label: 'Sách',
-        link: "Login",
+        label: 'Loại sách',
+        link: "Category",
         icon: "",
       }
     ]);
+
+    const store = useStore();
+
+    onMounted(async () => {
+      try {
+        const response = await API.get("profile");
+        if (response.data.success) {
+          store.dispatch("setUser", response.data.data)
+        }
+      } catch (e) {
+        router.push("/admin/login");
+        localStorage.setItem("token", "");
+      }
+    })
 
     return {
       menu
@@ -56,7 +73,7 @@ export default defineComponent({
 </template>
 
 <style scoped lang="scss">
-$sideBarWidth : 200px;
+$sideBarWidth : 230px;
 $headerHeight : 50px;
 
 .router-link-exact-active {
@@ -112,6 +129,8 @@ $headerHeight : 50px;
       left: 0;
       height: 100%;
       width: 100%;
+      padding: 30px;
+      background: #f6f6f6;
     }
   }
 }
