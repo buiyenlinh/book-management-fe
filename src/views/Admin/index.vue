@@ -11,12 +11,15 @@ export default defineComponent({
         label: 'Thống kê',
         link: "DashBoard",
         icon: "",
+        params: {}
       },
       {
         label: 'Loại sách',
         link: "Category",
         icon: "",
-      }
+        params: { page: 1 }
+      },
+      
     ]);
 
     const store = useStore();
@@ -26,6 +29,9 @@ export default defineComponent({
         const response = await API.get("profile");
         if (response.data.success) {
           store.dispatch("setUser", response.data.data)
+        } else {
+          router.push("/admin/login");
+          localStorage.setItem("token", "");
         }
       } catch (e) {
         router.push("/admin/login");
@@ -45,13 +51,13 @@ export default defineComponent({
   <div id="admin">
     <div class="admin d-flex">
       <div class="side-bar">
-        <div class="text-light p-3 text-center">Admin</div>
+        <div class="text-light p-3 text-center user-role">Admin</div>
         <ul class="nav flex-column" role="tablist">
           <li v-for="item in menu"
             :key="item"
             class="nav-item"
             >
-            <router-link :to="{name: item.link}">{{ item.label }}</router-link>
+            <router-link :to="{name: item.link, params: {page: item.params.page} }">{{ item.label }}</router-link>
           </li>
         </ul>
       </div>
@@ -93,7 +99,11 @@ $headerHeight : 50px;
   top: 0;
   position: fixed;
   left: 0;
+  .user-role {
+    border-bottom: 1px solid #d0cccd;
+  }
   .nav-item {
+    border-bottom: 1px solid #d0cccd;
     a {
       color: #fff;
       display: inline-block;

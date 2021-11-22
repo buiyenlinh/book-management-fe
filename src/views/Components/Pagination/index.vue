@@ -1,40 +1,66 @@
 <script lang="ts">
-import { defineComponent, inject, PropType, ref, watch } from 'vue'
-
-type PageType = {
-  current_page: null,
-  data: null,
-  first_page_url: null,
-  from: null,
-  last_page: null,
-  last_page_url: null,
-  links: [],
-  next_page_url: null,
-  path: null,
-  per_page: null,
-  prev_page_url: null,
-  to: null,
-  total: null
-}
+import { defineComponent, inject, PropType, ref, watch } from 'vue';
+import { Icon } from "@iconify/vue";
+import {ItemInterface, PageInterface} from "../../Type/index";
 
 export default defineComponent({
+  components: {
+    Icon
+  },
   props: {
     dataProp: {
-      type: Object as PropType<PageType>,
-      required: true
+      type: Object as PropType<PageInterface>,
+      required: true,
+      default: null
     }
   },
   setup(props) {
     const data = ref();
-
+    const currentPage = ref(1);
+    const pageList = ref<ItemInterface[]>([]);
+    
     watch(props, () => {
+      pageList.value = [];
       data.value = props.dataProp
+      currentPage.value = data.value?.current_page;
+
+      createPageList(data.value?.last_page);
     })
+
+    const createPageList = (lastPage: number) => {
+      if (lastPage <= 5) {
+        for(let i = 1; i <= lastPage; i++) {
+          pageList.value.push({
+            number: i, 
+            label: `${i}`
+          });
+        }
+      } else {
+        for(let i = 1; i <= lastPage; i++) {
+          if(i == 1|| i == currentPage.value -1 || i == currentPage.value || i == currentPage.value + 1 || i == lastPage) {
+            pageList.value.push({
+              number: i, 
+              label: `${i}`
+            });
+          }
+
+          if ((i == currentPage.value - 2 && i < 1 ) || (i == currentPage.value + 2) && i < lastPage) {
+            pageList.value.push({
+              number: null, 
+              label: "..."
+            });
+          } 
+        }
+      }
+      
+    }
 
     const handleChangePage = inject("handleChangePage");
     return {
       data,
-      handleChangePage
+      handleChangePage,
+      currentPage,
+      pageList
     }
   },
 })
@@ -43,17 +69,41 @@ export default defineComponent({
 
 <template>
   <ul class="pagination justify-content-end pagination-sm">
-    <li class="page-item" :class="data?.current_page == 1 ? 'prevent-click' : ''">
-      <a class="page-link" href="#">Pre</a>
-    </li>
     <li class="page-item"
-      v-for="page in data?.last_page" :key="page"
-      @click="handleChangePage(page)"
-      :class="data?.current_page == page ? 'active' : ''">
-      <a class="page-link" href="#">{{page}}</a>
+      :class="currentPage == 1 ? 'prevent-click' : ''"
+      @click="handleChangePage(currentPage - 1)">
+      <a class="page-link" href="#">
+        <Icon icon="bx:bx-chevron-left" />
+      </a>
     </li>
-    <li class="page-item" :class="data?.current_page == data?.last_page ? 'prevent-click' : ''">
-      <a class="page-link" href="#">Next</a>
+    <template v-for="page in pageList" :key="page">
+      <li class="page-item"
+        v-if="page.number != null"
+        @click="handleChangePage(page.number)"
+        :class="currentPage == page.number ? 'active' : ''">
+        <router-link class="page-link" :to="{name: 'Category', params: { page: page.number } }" >{{ page.label }}</router-link>
+      </li>
+      <li class="page-item"
+        v-else>
+        <span class="page-link" >{{ page.label }}</span>
+      </li>
+    </template>
+    <li class="page-item"
+      :class="currentPage == data?.last_page ? 'prevent-click' : ''"
+      @click="handleChangePage(currentPage + 1)">
+      <a class="page-link" href="#">
+        <Icon icon="bx:bx-chevron-right"/>
+      </a>
     </li>
   </ul> 
 </template>
+
+
+<style lang="scss" scoped>
+.prevent-click {
+  pointer-events: none;
+  a {
+    background: #d3d0d0;
+  }
+}
+</style>

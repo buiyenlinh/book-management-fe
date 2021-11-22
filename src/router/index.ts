@@ -4,6 +4,7 @@ import Login from "../views/Login/index.vue";
 import Admin from "../views/Admin/index.vue";
 import DashBoard from "../views/DashBoard/index.vue";
 import Category from "../views/Category/index.vue";
+import NotFound from "../views/Components/NotFound/index.vue";
 
 const routes: Array<RouteRecordRaw> = [
   {
@@ -22,7 +23,7 @@ const routes: Array<RouteRecordRaw> = [
         component: DashBoard
       },
       {
-        path: "category",
+        path: "category/page/:page",
         name: "Category",
         component: Category
       }
@@ -33,6 +34,14 @@ const routes: Array<RouteRecordRaw> = [
     name: "Login",
     component: Login,
   },
+  {
+    path: "/:pathMatch(.*)",
+    name: "NotFound",
+    meta: {
+      title: '404'
+    },
+    component: NotFound
+  }
 ];
 
 const router = createRouter({
