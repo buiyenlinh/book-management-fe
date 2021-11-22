@@ -15,9 +15,15 @@ export default function UseCategory () {
     addUpdateCategoryLoading.value = true;
     return API.post('category', params);
   }
+
+  const updateCategory = (id: number, params: category) => {
+    addUpdateCategoryLoading.value = true;
+    return API.patch(`category/${id}`, params);
+  }
   return {
     getCategoryList,
     addCategory,
-    addUpdateCategoryLoading
+    addUpdateCategoryLoading,
+    updateCategory
   }
 }

@@ -5,6 +5,7 @@ import { notify } from "@kyvg/vue3-notification";
 import moment from "moment";
 import AddUpdate from "./AddUpdate/index.vue"
 import Pagination from "../Components/Pagination/index.vue";
+import router from "../../router"
 
 export default defineComponent({
   components: {
@@ -12,13 +13,13 @@ export default defineComponent({
     Pagination
   },
   setup() {
-    const { getCategoryList } = UseCategory();
-    const currentPage = ref(1);
-    const categoryList = ref(1);
 
+    const { getCategoryList } = UseCategory();
+    const currentPage = ref(Number(router.currentRoute.value.params.page));
+    const categoryList = ref(1);
     
-    const handleGetCategoryList = (page: number) => {
-      getCategoryList(page).then(function(response) {
+    const handleGetCategoryList = () => {
+      getCategoryList(currentPage.value).then(function(response) {
         categoryList.value = response.data.data;
       }).catch(function(error){
         notify({
@@ -27,23 +28,32 @@ export default defineComponent({
         });
       })
     }
-    handleGetCategoryList(currentPage.value);
+    handleGetCategoryList();
     const handleChangePage = (page : number) => {
       currentPage.value = page;
-      handleGetCategoryList(currentPage.value);
+      handleGetCategoryList();
+    }
+    const itemCategory = ref();
+    const selectCategory = (item: any) => {
+      itemCategory.value = item;
     }
 
+    const resetItemCategory = () => {
+      itemCategory.value = null
+    }
     provide("handleGetCategoryList", handleGetCategoryList);
-    provide("currentPage", currentPage);
     provide("handleChangePage", handleChangePage);
+    provide("resetItemCategory", resetItemCategory);
     return {
       categoryList,
-      handleChangePage
+      handleChangePage,
+      selectCategory,
+      itemCategory
     }
   },
   methods: {
     formatDate(date: Date) {
-      return moment(date).format("HH:mm - DD/MM/YYYY");
+      return moment(date).format("HH:mm, DD-MM-YYYY");
     }
   }
 })
@@ -83,7 +93,11 @@ export default defineComponent({
             <td>{{ formatDate(item.created_at) }}</td>
             <td>{{ formatDate(item.updated_at) }}</td>
             <td>
-              <b class="text-info mr-2">Sửa</b>
+              <b class="text-info mr-2"
+                style="cursor: pointer"
+                @click="selectCategory(item)"
+                data-toggle="modal"
+                data-target="#add-update-category-id">Sửa</b>
               <b class="text-danger">Xóa</b>
             </td>
           </tr>
@@ -92,7 +106,7 @@ export default defineComponent({
     </div>
     <Pagination :dataProp="categoryList"/>
   </div>
-  <AddUpdate/>
+  <AddUpdate :itemCategory="itemCategory" />
 </template>
 
 <style scoped lang="scss">
@@ -105,13 +119,6 @@ export default defineComponent({
     box-shadow: 0px 4px 10px 3px rgba(3, 55, 119, 0.15);
     table thead th {
       text-transform: capitalize;
-    }
-
-    .prevent-click {
-      pointer-events: none;
-      a {
-        background: #d3d0d0;
-      }
     }
   }
 </style>
