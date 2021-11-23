@@ -44,7 +44,7 @@ export default defineComponent({
             });
           }
 
-          if ((i == currentPage.value - 2 && i < 1 ) || (i == currentPage.value + 2) && i < lastPage) {
+          if ((i == currentPage.value - 2 && i > 1 ) || (i == currentPage.value + 2) && i < lastPage) {
             pageList.value.push({
               number: null, 
               label: "..."
@@ -71,11 +71,18 @@ export default defineComponent({
   <ul class="pagination justify-content-end pagination-sm">
     <li class="page-item"
       :class="currentPage == 1 ? 'prevent-click' : ''"
-      @click="handleChangePage(currentPage - 1)">
-      <a class="page-link" href="#">
+      >
+      <a class="page-link" href="#" v-if="currentPage <= 1">
         <Icon icon="bx:bx-chevron-left" />
       </a>
+      <router-link v-else
+        class="page-link"
+        :to="{name: 'Category', params: { page: currentPage - 1 } }" @click="handleChangePage(currentPage - 1)"
+      >
+        <Icon icon="bx:bx-chevron-left" />
+      </router-link>
     </li>
+
     <template v-for="page in pageList" :key="page">
       <li class="page-item"
         v-if="page.number != null"
@@ -88,12 +95,19 @@ export default defineComponent({
         <span class="page-link" >{{ page.label }}</span>
       </li>
     </template>
+
     <li class="page-item"
       :class="currentPage == data?.last_page ? 'prevent-click' : ''"
-      @click="handleChangePage(currentPage + 1)">
-      <a class="page-link" href="#">
-        <Icon icon="bx:bx-chevron-right"/>
+      >
+      <a class="page-link" href="#" v-if="currentPage >= data?.last_page">
+        <Icon icon="bx:bx-chevron-right" />
       </a>
+      <router-link v-else
+        class="page-link"
+        :to="{name: 'Category', params: { page: currentPage + 1 } }" @click="handleChangePage(currentPage + 1)"
+      >
+        <Icon icon="bx:bx-chevron-right" />
+      </router-link>
     </li>
   </ul> 
 </template>
