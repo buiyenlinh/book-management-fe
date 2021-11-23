@@ -4,13 +4,15 @@ import UseCategory from "./UseCategory";
 import { notify } from "@kyvg/vue3-notification";
 import moment from "moment";
 import AddUpdate from "./AddUpdate/index.vue"
+import DeleteCategory from "./DeleteCategory/index.vue"
 import Pagination from "../Components/Pagination/index.vue";
 import router from "../../router"
 
 export default defineComponent({
   components: {
     AddUpdate,
-    Pagination
+    Pagination,
+    DeleteCategory
   },
   setup() {
 
@@ -98,7 +100,12 @@ export default defineComponent({
                 @click="selectCategory(item)"
                 data-toggle="modal"
                 data-target="#add-update-category-id">Sửa</b>
-              <b class="text-danger">Xóa</b>
+
+              <b class="text-danger mr-2"
+                style="cursor: pointer"
+                @click="selectCategory(item)"
+                data-toggle="modal"
+                data-target="#delete-category-id">Xóa</b>
             </td>
           </tr>
         </tbody>
@@ -107,6 +114,7 @@ export default defineComponent({
     <Pagination :dataProp="categoryList"/>
   </div>
   <AddUpdate :itemCategory="itemCategory" />
+  <DeleteCategory :itemCategory="itemCategory" />
 </template>
 
 <style scoped lang="scss">

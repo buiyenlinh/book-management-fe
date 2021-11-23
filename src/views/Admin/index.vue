@@ -1,28 +1,17 @@
 <script lang="ts">
-import { defineComponent, onMounted, reactive } from 'vue';
+import { defineComponent, onMounted, reactive, ref, watch } from 'vue';
 import router from "@/router"
 import API from "../../services"
-import { useStore } from "vuex"
+import { useStore } from "vuex";
+import { Icon } from '@iconify/vue';
 
 export default defineComponent({
+  components: {
+    Icon
+  },
   setup() {
-    const menu = reactive([
-      {
-        label: 'Thống kê',
-        link: "DashBoard",
-        icon: "",
-        params: {}
-      },
-      {
-        label: 'Loại sách',
-        link: "Category",
-        icon: "",
-        params: { page: 1 }
-      },
-      
-    ]);
-
     const store = useStore();
+    const category_page = ref(1);
 
     onMounted(async () => {
       try {
@@ -33,11 +22,38 @@ export default defineComponent({
           router.push("/admin/login");
           localStorage.setItem("token", "");
         }
+
+        if (Number(router.currentRoute.value.params.page) > 0) {
+          menu.value[1].params.page = Number(router.currentRoute.value.params.page);
+        }
       } catch (e) {
         router.push("/admin/login");
         localStorage.setItem("token", "");
       }
     })
+
+    watch(() => router.currentRoute.value.params.page, (newPage, oldPage) => {
+      if (Number(newPage) > 0) {
+        menu.value[1].params.page = Number(newPage);
+      }
+    })
+
+    const menu = ref([
+      {
+        label: 'Thống kê',
+        link: "DashBoard",
+        icon: "carbon:dashboard",
+        params: {}
+      },
+      {
+        label: 'Loại sách',
+        link: "Category",
+        icon: "cil:book",
+        params: {
+          page: category_page.value
+        }
+      },
+    ]);
 
     return {
       menu
@@ -57,7 +73,12 @@ export default defineComponent({
             :key="item"
             class="nav-item"
             >
-            <router-link :to="{name: item.link, params: {page: item.params.page} }">{{ item.label }}</router-link>
+            <router-link v-if="item?.params?.page" :to="{name: item.link, params: {page: item.params.page} }">
+              <Icon :icon="item.icon" />
+              {{ item.label }}
+            </router-link>
+
+            <router-link v-else :to="{name: item.link}"><Icon :icon="item.icon" /> {{ item.label }}</router-link>
           </li>
         </ul>
       </div>
