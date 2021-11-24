@@ -8,6 +8,11 @@ export default defineComponent({
     Icon
   },
   props: {
+    nameRoute: {
+      type: String,
+      required: true,
+      default: null
+    },
     dataProp: {
       type: Object as PropType<PageInterface>,
       required: true,
@@ -18,10 +23,12 @@ export default defineComponent({
     const data = ref();
     const currentPage = ref(1);
     const pageList = ref<ItemInterface[]>([]);
+    const route_name = ref("");
     
     watch(props, () => {
+      route_name.value = props.nameRoute;
       pageList.value = [];
-      data.value = props.dataProp
+      data.value = props.dataProp;
       currentPage.value = data.value?.current_page;
 
       createPageList(data.value?.last_page);
@@ -60,7 +67,8 @@ export default defineComponent({
       data,
       handleChangePage,
       currentPage,
-      pageList
+      pageList,
+      route_name
     }
   },
 })
@@ -77,7 +85,7 @@ export default defineComponent({
       </a>
       <router-link v-else
         class="page-link"
-        :to="{name: 'Category', params: { page: currentPage - 1 } }" @click="handleChangePage(currentPage - 1)"
+        :to="{name: route_name, params: { page: currentPage - 1 } }" @click="handleChangePage(currentPage - 1)"
       >
         <Icon icon="bx:bx-chevron-left" />
       </router-link>
@@ -88,7 +96,7 @@ export default defineComponent({
         v-if="page.number != null"
         @click="handleChangePage(page.number)"
         :class="currentPage == page.number ? 'active' : ''">
-        <router-link class="page-link" :to="{name: 'Category', params: { page: page.number } }" >{{ page.label }}</router-link>
+        <router-link class="page-link" :to="{name: route_name, params: { page: page.number } }" >{{ page.label }}</router-link>
       </li>
       <li class="page-item"
         v-else>
@@ -104,7 +112,7 @@ export default defineComponent({
       </a>
       <router-link v-else
         class="page-link"
-        :to="{name: 'Category', params: { page: currentPage + 1 } }" @click="handleChangePage(currentPage + 1)"
+        :to="{name: route_name, params: { page: currentPage + 1 } }" @click="handleChangePage(currentPage + 1)"
       >
         <Icon icon="bx:bx-chevron-right" />
       </router-link>
