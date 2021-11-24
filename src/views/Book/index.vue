@@ -1,10 +1,10 @@
 <script lang="ts">
 import { defineComponent, ref, provide } from "vue";
-import UseCategory from "./UseCategory";
+import UseBook from "./UseBook";
 import { notify } from "@kyvg/vue3-notification";
 import moment from "moment";
 import AddUpdate from "./AddUpdate/index.vue"
-import DeleteCategory from "./DeleteCategory/index.vue"
+import DeleteBook from "./DeleteBook/index.vue"
 import Pagination from "../Components/Pagination/index.vue";
 import router from "../../router"
 
@@ -12,16 +12,17 @@ export default defineComponent({
   components: {
     AddUpdate,
     Pagination,
-    DeleteCategory
+  //   DeleteBook
   },
   setup() {
-    const { getCategoryList } = UseCategory();
+
+    const { getBookList } = UseBook();
     const currentPage = ref(Number(router.currentRoute.value.params.page));
-    const categoryList = ref(1);
-    
-    const handleGetCategoryList = () => {
-      getCategoryList(currentPage.value).then(function(response) {
-        categoryList.value = response.data.data;
+    const bookList = ref(1);
+
+    const handleGetBookList = () => {
+      getBookList(currentPage.value).then(function(response) {
+        bookList.value = response.data.data;
       }).catch(function(error){
         notify({
           title: error?.response?.data?.errors,
@@ -29,27 +30,27 @@ export default defineComponent({
         });
       })
     }
-    handleGetCategoryList();
+    handleGetBookList();
     const handleChangePage = (page : number) => {
       currentPage.value = page;
-      handleGetCategoryList();
+      handleGetBookList();
     }
-    const itemCategory = ref();
-    const selectCategory = (item: any) => {
-      itemCategory.value = item;
+    const itemBook = ref();
+    const selectBook = (item: any) => {
+      itemBook.value = item;
     }
 
-    const resetItemCategory = () => {
-      itemCategory.value = null
+    const resetItemBook = () => {
+      itemBook.value = null
     }
-    provide("handleGetCategoryList", handleGetCategoryList);
+    provide("handleGetBookList", handleGetBookList);
     provide("handleChangePage", handleChangePage);
-    provide("resetItemCategory", resetItemCategory);
+    provide("resetItemBook", resetItemBook);
     return {
-      categoryList,
+      bookList,
       handleChangePage,
-      selectCategory,
-      itemCategory
+      selectBook,
+      itemBook
     }
   },
   methods: {
@@ -62,11 +63,11 @@ export default defineComponent({
 
 
 <template>
-  <div class="category">
-    <h4>Danh sách loại sách</h4>
+  <div class="book">
+    <h4>Danh sách quyển sách</h4>
 
-    <div class="d-flex justify-content-between">
-      <div class="search-category" style="width: 30%">
+     <div class="d-flex justify-content-between">
+      <div class="search-Book" style="width: 30%">
         <div class="input-group mb-3">
           <input type="text" class="form-control-sm form-control rounded-0" placeholder="Nhập tên...">
           <div class="input-group-append">
@@ -74,50 +75,58 @@ export default defineComponent({
           </div>
         </div>
       </div>
-      <div class="add-category">
-        <button class="btn btn-info btn-sm rounded-0" data-toggle="modal" data-target="#add-update-category-id">Thêm</button>
+      <div class="add-Book">
+        <button class="btn btn-info btn-sm rounded-0" data-toggle="modal" data-target="#add-update-book-id">Thêm</button>
       </div>
     </div>
     <div class="table-responsive">
       <table class="table table-striped table-hover">
         <thead style="color: #252f3b">
-          <th>Tên loại sách</th>
+          <th>Tên sách</th>
+          <th>Tác giả</th>
+          <th>Ngôn ngữ</th>
+          <th>Nhà xuất bản</th>
+          <th>Loại sách</th>
           <th>Người tạo</th>
-          <th>Thời gian tạo</th>
+          <th>Ngày tạo</th>
           <th>Cập nhật lần cuối</th>
           <th>Thao tác</th>
         </thead>
         <tbody>
-          <tr v-for="item in categoryList?.data" :key="item.id">
-            <td>{{ item.name }}</td>
+          <tr v-for="item in bookList?.data" :key="item.id">
+            <td>{{ item.title }}</td>
+            <td>{{ item.author }}</td>
+            <td>{{ item.language }}</td>
+            <td>{{ item.producer }}</td>
+            <td>{{ item.category.name }}</td>
             <td>{{ item.username }}</td>
             <td>{{ formatDate(item.created_at) }}</td>
             <td>{{ formatDate(item.updated_at) }}</td>
             <td>
               <b class="text-info mr-2"
                 style="cursor: pointer"
-                @click="selectCategory(item)"
+                @click="selectBook(item)"
                 data-toggle="modal"
-                data-target="#add-update-category-id">Sửa</b>
+                data-target="#add-update-Book-id">Sửa</b>
 
               <b class="text-danger mr-2"
                 style="cursor: pointer"
-                @click="selectCategory(item)"
+                @click="selectBook(item)"
                 data-toggle="modal"
-                data-target="#delete-category-id">Xóa</b>
+                data-target="#delete-Book-id">Xóa</b>
             </td>
           </tr>
         </tbody>
       </table>
     </div>
-    <Pagination :dataProp="categoryList.meta" :nameRoute="'Category'"/>
+    <Pagination :dataProp="bookList.meta"  :nameRoute="'Book'"/>
   </div>
-  <AddUpdate :itemCategory="itemCategory" />
-  <DeleteCategory :itemCategory="itemCategory" />
+  <AddUpdate :itemBook="itemBook" />
+  <!-- <DeleteBook :itemBook="itemBook" /> -->
 </template>
 
 <style scoped lang="scss">
-  .category {
+  .book {
     width: 100%;
     height: 100%;
     background: #fff;

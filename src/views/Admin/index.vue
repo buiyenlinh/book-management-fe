@@ -4,37 +4,34 @@ import router from "@/router"
 import API from "../../services"
 import { useStore } from "vuex";
 import { Icon } from '@iconify/vue';
+import { base } from "@/services/base"
 
 export default defineComponent({
   components: {
     Icon
   },
   setup() {
+    const { URL_IMAGE } = base();
     const store = useStore();
-    const category_page = ref(1);
+    const account = ref();
+    const currentName = ref(router.currentRoute.value.name);
+    watch(router.currentRoute, () => {
+      currentName.value = router.currentRoute.value.name;
+    })
 
     onMounted(async () => {
       try {
         const response = await API.get("profile");
         if (response.data.success) {
           store.dispatch("setUser", response.data.data)
+          account.value = response.data.data;
         } else {
           router.push("/admin/login");
           localStorage.setItem("token", "");
         }
-
-        if (Number(router.currentRoute.value.params.page) > 0) {
-          menu.value[1].params.page = Number(router.currentRoute.value.params.page);
-        }
       } catch (e) {
         router.push("/admin/login");
         localStorage.setItem("token", "");
-      }
-    })
-
-    watch(() => router.currentRoute.value.params.page, (newPage, oldPage) => {
-      if (Number(newPage) > 0) {
-        menu.value[1].params.page = Number(newPage);
       }
     })
 
@@ -50,13 +47,30 @@ export default defineComponent({
         link: "Category",
         icon: "cil:book",
         params: {
-          page: category_page.value
+          page: 1
+        }
+      },
+      {
+        label: 'Sách',
+        link: "Book",
+        icon: "bi:book",
+        params: {
+          page: 1
         }
       },
     ]);
 
+    const changeBars = ref(false);
+    const handleBars = () => {
+      changeBars.value = !changeBars.value;
+    }
     return {
-      menu
+      menu,
+      currentName,
+      account,
+      URL_IMAGE,
+      handleBars,
+      changeBars
     }
   },
 })
@@ -64,29 +78,38 @@ export default defineComponent({
 
 
 <template>
-  <div id="admin">
+  <div id="admin" :class="changeBars ? 'close-side-bars' : ''">
     <div class="admin d-flex">
       <div class="side-bar">
-        <div class="text-light p-3 text-center user-role">Admin</div>
+        <div class="text-light pt-3 pb-3 text-center user-role">
+          <img :src="URL_IMAGE + account?.avatar" alt="">
+        </div>
         <ul class="nav flex-column" role="tablist">
           <li v-for="item in menu"
             :key="item"
             class="nav-item"
+            :class="item.link==currentName ? 'router-link-exact-active' : ''"
             >
             <router-link v-if="item?.params?.page" :to="{name: item.link, params: {page: item.params.page} }">
-              <Icon :icon="item.icon" />
-              {{ item.label }}
+              <Icon :icon="item.icon" width="20" class="mb-1" />
+              <span class="ml-2">{{ item.label }}</span>
             </router-link>
 
-            <router-link v-else :to="{name: item.link}"><Icon :icon="item.icon" /> {{ item.label }}</router-link>
+            <router-link v-else :to="{name: item.link}">
+              <Icon :icon="item.icon"  width="20" class="mb-1" />
+              <span class="ml-2">{{ item.label }}</span>
+            </router-link>
           </li>
         </ul>
       </div>
       <div class="content">
         <div class="content-header">
           <div class="d-flex justify-content-between">
-            <b>This is header left</b>
-            <button class="btn btn-info btn-sm">Button</button>
+            <Icon icon="uis:bars"  width="40" @click="handleBars" style="cursor: pointer" />
+            <b style="padding: 7px 0px; cursor: pointer">
+              <Icon icon="ant-design:logout-outlined" width="20" style="margin-bottom: 4px" />
+              Đăng xuất
+            </b>
           </div>
         </div>
         <div class="content-relative">
@@ -102,10 +125,13 @@ export default defineComponent({
 <style scoped lang="scss">
 $sideBarWidth : 230px;
 $headerHeight : 50px;
+$sideBarWidthClose: 60px;
 
 .router-link-exact-active {
   background: #d0cccd;
-  color: #252f3b !important;
+  a {
+    color: #252f3b !important;
+  }
 }
 
 #admin, .admin {
@@ -120,16 +146,27 @@ $headerHeight : 50px;
   top: 0;
   position: fixed;
   left: 0;
+  transition: width ease-in-out 0.4s;
   .user-role {
     border-bottom: 1px solid #d0cccd;
+    img {
+      width: 40px;
+      height: 40px;
+      object-fit: cover;
+      border-radius: 50%;
+      border: 1px solid #fff;
+    }
   }
   .nav-item {
     border-bottom: 1px solid #d0cccd;
     a {
       color: #fff;
       display: inline-block;
-      width: 100%;
-      padding: 10px 15px;
+      width: $sideBarWidth;
+      padding: 10px 15px 4px 15px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
     }
     a:hover{
       text-decoration: none;
@@ -141,14 +178,17 @@ $headerHeight : 50px;
   width: calc(100% - $sideBarWidth);
   margin-left: $sideBarWidth;
   position: relative;
+  transition: all ease-in-out 0.4s;
   .content-header {
     height: $headerHeight;
     border-bottom: 1px solid #ddd;
     position: fixed;
     top: 0;
-    width: 100%;
+    width: calc(100% - $sideBarWidth);
     background: #fff;
     z-index: 100;
+    padding: 5px 30px;
+    transition: width ease-in-out 0.4s;
   }
   .content-relative {
     position: relative;
@@ -158,11 +198,30 @@ $headerHeight : 50px;
       position: absolute;
       top: $headerHeight;
       left: 0;
-      height: 100%;
       width: 100%;
+      min-height: 100vh;
       padding: 30px;
       background: #f6f6f6;
     }
   }
 }
+
+.close-side-bars {
+  .side-bar {
+    width: $sideBarWidthClose;
+    .nav-item {
+      a {
+        width: $sideBarWidthClose;
+      }
+    }
+  }
+  .content {
+    width: calc(100% - $sideBarWidthClose);
+    margin-left: $sideBarWidthClose;
+    .content-header {
+      width: calc(100% - $sideBarWidthClose);
+    }
+  }
+}
+
 </style>
