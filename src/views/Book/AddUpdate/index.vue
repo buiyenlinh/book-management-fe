@@ -1,7 +1,7 @@
 <script lang="ts">
 import { defineComponent, ref } from 'vue'
 import UseBook from "../UseBook"
-import { BookInterFace } from "../../Type/index"
+// import { BookInterFace } from "../../Type/index"
 
 export default defineComponent({
   setup() {
@@ -39,7 +39,7 @@ export default defineComponent({
       checkProducer();
       checkAuthor();
       checkContent();
-      if (title.value && describe.value && language.value && page_total.value && author.value && content.value) {
+      if (title.value && describe.value && language.value && page_total.value && author.value && content.value && page_total.value > 0) {
         console.log("Submit");
       }
     }
@@ -74,6 +74,8 @@ export default defineComponent({
     const checkPage_total = () => {
       if (page_total.value == "" || page_total.value == null) {
         error.value.page_total = "Tổng số trang là bắt buộc";
+      } else if (page_total.value <= 0) {
+        error.value.page_total = "Tổng số trang phải lớn hơn 0";
       } else {
         error.value.page_total = "";
       }
@@ -103,6 +105,9 @@ export default defineComponent({
       }
     }
 
+    const handleChangeCover = (event: Event) => {
+      console.log(event);
+    }
     return {
       addUpdateBookLoading,
       closeModal,
@@ -111,7 +116,8 @@ export default defineComponent({
       author, content, mp3, category_id, status,
       error,
       checkTitle, checkDescribe, checkLanguage, checkPage_total,
-      checkProducer, checkAuthor, checkContent
+      checkProducer, checkAuthor, checkContent,
+      handleChangeCover
     }
   },
 })
@@ -210,7 +216,7 @@ export default defineComponent({
 
               <div class="col-md-6">
                 <div class="form-group">
-                  <label for="">Bìa sách <span class="text-danger">*</span></label><br>
+                  <label for="">Bìa sách <span class="text-danger" @change="handleChangeCover">*</span></label><br>
                   <input type="file">
                   <div class="pt-2">
                     <i class="text-danger error">{{ error?.cover_image }}</i>
