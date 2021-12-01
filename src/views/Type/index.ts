@@ -22,7 +22,7 @@ export interface CategoryInterface {
   created_at: string
 }
 
-export interface BookInterFace {
+export interface BookInterface {
   title: string | null,
   describe: string | null,
   language: string | null,
@@ -32,5 +32,10 @@ export interface BookInterFace {
   author: string | null,
   content: string | null,
   mp3: string | null,
-  category_id: number | null,
+  category: {
+    id: number,
+    name: string
+  },
+  status: number | string |  null,
+  username: string
 }
