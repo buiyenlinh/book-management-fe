@@ -7,6 +7,7 @@ import AddUpdate from "./AddUpdate/index.vue"
 import DeleteBook from "./DeleteBook/index.vue"
 import Pagination from "../Components/Pagination/index.vue";
 import router from "../../router"
+import { BookInterface } from "../Type/index"
 
 export default defineComponent({
   components: {
@@ -30,13 +31,14 @@ export default defineComponent({
         });
       })
     }
+    
     handleGetBookList();
     const handleChangePage = (page : number) => {
       currentPage.value = page;
       handleGetBookList();
     }
     const itemBook = ref();
-    const selectBook = (item: any) => {
+    const selectBook = (item: BookInterface) => {
       itemBook.value = item;
     }
 
@@ -107,13 +109,13 @@ export default defineComponent({
                 style="cursor: pointer"
                 @click="selectBook(item)"
                 data-toggle="modal"
-                data-target="#add-update-Book-id">Sửa</b>
+                data-target="#add-update-book-id">Sửa</b>
 
               <b class="text-danger mr-2"
                 style="cursor: pointer"
                 @click="selectBook(item)"
                 data-toggle="modal"
-                data-target="#delete-Book-id">Xóa</b>
+                data-target="#delete-book-id">Xóa</b>
             </td>
           </tr>
         </tbody>
