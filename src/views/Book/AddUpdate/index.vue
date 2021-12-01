@@ -1,11 +1,11 @@
 <script lang="ts">
 import { defineComponent, ref } from 'vue'
 import UseBook from "../UseBook"
-import { BookInterFace } from "../../Type/index"
+import { BookInterface } from "../../Type/index"
 
 export default defineComponent({
   setup() {
-    const { addUpdateBookLoading, addBook, updatebook } = UseBook();
+    const { addUpdateBookLoading, addBook, updateBook } = UseBook();
     const book = ref();
     const title = ref();
     const describe = ref();
