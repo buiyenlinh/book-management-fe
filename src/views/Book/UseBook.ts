@@ -1,8 +1,5 @@
 import API from "@/services"
 import { ref } from "vue";
-import { BookInterface } from "../Type/index"
-
-
 
 export default function UseBook () {
   const addUpdateBookLoading = ref(false);
@@ -12,12 +9,12 @@ export default function UseBook () {
     return API.get(`book?page=${page}`);
   }
 
-  const addBook = (params : any) => {
+  const addBook = (params : FormData) => {
     addUpdateBookLoading.value = true;
     return API.post('book', params);
   }
 
-  const updateBook = (id: number, params: any) => {
+  const updateBook = (id: number, params: FormData) => {
     addUpdateBookLoading.value = true;
     return API.post(`book/update/${id}`, params);
   }

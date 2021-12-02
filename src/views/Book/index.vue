@@ -4,7 +4,7 @@ import UseBook from "./UseBook";
 import { notify } from "@kyvg/vue3-notification";
 import moment from "moment";
 import AddUpdate from "./AddUpdate/index.vue"
-import DeleteBook from "./DeleteBook/index.vue"
+import DeleteBook from "./Delete/index.vue"
 import Pagination from "../Components/Pagination/index.vue";
 import router from "../../router"
 import { BookInterface } from "../Type/index"
@@ -13,7 +13,7 @@ export default defineComponent({
   components: {
     AddUpdate,
     Pagination,
-  //   DeleteBook
+    DeleteBook
   },
   setup() {
 
@@ -124,7 +124,7 @@ export default defineComponent({
     <Pagination :dataProp="bookList.meta"  :nameRoute="'Book'"/>
   </div>
   <AddUpdate :itemBook="itemBook" />
-  <!-- <DeleteBook :itemBook="itemBook" /> -->
+  <DeleteBook :itemBook="itemBook" />
 </template>
 
 <style scoped lang="scss">
