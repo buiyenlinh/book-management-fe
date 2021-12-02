@@ -56,7 +56,7 @@ export default defineComponent({
         error.value.category_id = "Loại truyện là bắt buộc";
       }
       
-      if (title.value && describe.value && language.value && page_total.value && author.value && content.value && page_total.value > 0) {
+      if (title.value && describe.value && language.value && page_total.value && author.value && content.value && page_total.value > 0 && error.value.mp3 == "" && error.value.cover_image == "") {
         const formData = new FormData();
         formData.append('title', title.value);
         formData.append('describe', describe.value);
@@ -148,6 +148,20 @@ export default defineComponent({
     })
     const closeModal = () => {
       console.log("Close");
+      mp3_name_preview.value = "";
+      mp3_preview.value = "";
+      book.value = "";
+      title.value = "";
+      describe.value = "";
+      language.value = "";
+      page_total.value = "";
+      cover_image.value = "";
+      producer.value = "";
+      author.value = "";
+      content.value = "";
+      mp3.value = "";
+      category_id.value = "";
+      status.value=  1;
     }
 
     const checkTitle = () => {
@@ -209,15 +223,28 @@ export default defineComponent({
     }
 
     const coverPreview = ref();
-    const mp3_preview = ref();
+    const mp3_preview = ref('');
     const handleChangeCover = (event: any) => {
-      cover_image.value = event?.target.files[0];
-      coverPreview.value = URL.createObjectURL(event?.target.files[0]);
+      console.log(event?.target.files[0]);
+      if (event?.target.files[0].type != "image/jpeg" && event?.target.files[0].type != "image/png" && event?.target.files[0].type != "image/jpg") {
+        error.value.cover_image = "Vui lòng chọn ảnh có phần mở rộng 'jpg', 'png', jpeg'";
+      } else {
+        cover_image.value = event?.target.files[0];
+        coverPreview.value = URL.createObjectURL(event?.target.files[0]);
+        error.value.cover_image = "";
+      }
     }
 
+    const mp3_name_preview = ref();
     const handleChangeMp3 = (event: any) => {
-      mp3_preview.value = URL.createObjectURL(event?.target.files[0]);
-      mp3.value = event.target.files[0];
+      console.log(event?.target.files[0]);
+      if (event?.target.files[0].type != "audio/mpeg") {
+        error.value.mp3 = 'Vui lòng chọn file có phần mở rộng là "mp3"';
+      } else {
+        mp3.value = event.target.files[0];
+        error.value.mp3 = "";
+      }
+      mp3_name_preview.value = event?.target?.files[0].name;
     }
 
     const categoryList = ref();
@@ -238,7 +265,8 @@ export default defineComponent({
       categoryList,
       coverPreview,
       handleChangeMp3,
-      mp3_preview
+      mp3_preview,
+      mp3_name_preview
     }
   },
 })
@@ -372,7 +400,8 @@ export default defineComponent({
                   />
 
                   <div class="mt-1">
-                    <audio controls v-if="mp3_preview">
+                    <div v-if="mp3_name_preview" >File vừa chọn: {{ mp3_name_preview }}</div>
+                    <audio controls v-if="mp3_preview  != ''">
                       <source :src="mp3_preview" type="audio/mpeg">
                     </audio>
                   </div>
