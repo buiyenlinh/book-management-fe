@@ -39,3 +39,17 @@ export interface BookInterface {
   status: number | string |  null,
   username: string
 }
+
+export interface UserInterface {
+  username: string | null,
+  fullname: string | null,
+  birthday: string | null,
+  gender: string | null,
+  address: string | null,
+  avatar: string | null,
+  role: {
+    id: number,
+    name: string
+  },
+  active: number | null,
+}
