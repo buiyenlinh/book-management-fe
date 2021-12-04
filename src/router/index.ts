@@ -5,6 +5,7 @@ import Admin from "../views/Admin/index.vue";
 import DashBoard from "../views/DashBoard/index.vue";
 import Category from "../views/Category/index.vue";
 import Book from "../views/Book/index.vue";
+import User from "../views/User/index.vue";
 import NotFound from "../views/Components/NotFound/index.vue";
 
 const routes: Array<RouteRecordRaw> = [
@@ -32,6 +33,11 @@ const routes: Array<RouteRecordRaw> = [
         path: "book/page/:page(\\d+)",  
         name: "Book",
         component: Book
+      },
+      {
+        path: "user/page/:page(\\d+)",  
+        name: "User",
+        component: User
       }
     ],
   },
