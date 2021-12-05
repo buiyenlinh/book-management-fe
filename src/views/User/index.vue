@@ -1,5 +1,5 @@
 <script lang="ts">
-import { defineComponent, ref, provide, watch } from "vue";
+import { defineComponent, ref, provide } from "vue";
 import UseUser from "./UseUser";
 import { notify } from "@kyvg/vue3-notification";
 import moment from "moment";
@@ -26,10 +26,9 @@ export default defineComponent({
     const { URL_IMAGE } = base();
 
     const userRoleLogin = ref();
-    watch(() => store.state.user, (newUS, oldUS) => {
-      userRoleLogin.value = Number(newUS.role.level);
-    })
+
     const handleGetUserList = () => {
+      userRoleLogin.value = Number(store.state.user?.role?.level);
       getUserList(currentPage.value).then(function(response) {
         userList.value = response.data.data;
       }).catch(function(error){
