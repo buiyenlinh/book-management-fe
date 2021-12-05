@@ -51,7 +51,7 @@ export default defineComponent({
         error.value.role_id = "Vai trò người dùng là bắt buộc";
       }
       
-      if (username.value && fullname.value && birthday.value && gender.value && address.value && role_id.value && active.value && error.value.avatar == "") {
+      if (username.value && fullname.value && birthday.value && gender.value && address.value && role_id.value && active.value) {
         const formData = new FormData();
         formData.append('username', username.value);
         formData.append('fullname', fullname.value);
@@ -60,7 +60,13 @@ export default defineComponent({
         formData.append('address', address.value);
         formData.append('active', '' + active.value);
         formData.append('role_id', role_id.value);
-        
+        if (avatar.value) {
+          formData.append('avatar', avatar.value);
+        }
+        if (password.value) {
+          formData.append('password', password.value);
+        }
+
         if (user.value?.id) {
           updateUser(user.value?.id, formData).then(function(response) {
             addUpdateUserLoading.value = true;
@@ -122,8 +128,6 @@ export default defineComponent({
         } else {
           checkPassword();
           if (password.value && avatar.value) {
-            formData.append('avatar', avatar.value);
-            formData.append('password', password.value);
             addUser(formData).then(function(response) {
               addUpdateUserLoading.value = true;
               notify({
@@ -138,12 +142,7 @@ export default defineComponent({
               addUpdateUserLoading.value = false;
               if (error?.response?.data?.errors) {
                 notify({
-                  title: error?.response?.data?.errors,
-                  type: "warn"
-                });
-              } else {
-                notify({
-                  title: error?.response?.data?.errors?.title[0],
+                  title: error?.response?.data?.errors.username[0],
                   type: "warn"
                 });
               }
@@ -151,25 +150,28 @@ export default defineComponent({
               addUpdateUserLoading.value = false;
             })
           }
-          }
+        }
       }
     }
 
     watch(() => props.userSelect, (newItem, oldItem) => {
       user.value = newItem;
-      username.value = newItem?.username;
-      fullname.value = newItem?.fullname;
-      gender.value = '' + newItem?.gender;
-      active.value = Number(newItem?.active);
-      address.value = newItem?.address;
-      if (newItem?.birthday) {
-        birthday.value = moment(newItem?.birthday).format("YYYY-MM-DD");
+      if (newItem?.username) {
+        username.value = newItem?.username;
+        fullname.value = newItem?.fullname;
+        gender.value = '' + newItem?.gender;
+        active.value = Number(newItem?.active);
+        address.value = newItem?.address;
+        if (newItem?.birthday) {
+          birthday.value = moment(newItem?.birthday).format("YYYY-MM-DD");
+        }
+
+        avatar.value = newItem?.avatar;
+        role_id.value = newItem?.role?.id;
+        if (avatar.value) {
+          avatar_preview.value = URL_IMAGE + avatar.value;
+        }
       }
-
-      avatar.value = newItem?.avatar;
-      role_id.value = newItem?.role?.id;
-
-      avatar_preview.value = URL_IMAGE + avatar.value;
     })
     const closeModal = () => {
       if (resetUserSelect) {
