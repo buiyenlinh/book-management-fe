@@ -11,9 +11,11 @@ export default defineComponent({
     Icon
   },
   setup() {
-    const { URL_IMAGE } = base();
+    const { URL_IMAGE, IMAGE_DEFAULT } = base();
     const store = useStore();
     const account = ref();
+    const avatar = ref('');
+
     const currentName = ref(router.currentRoute.value.name);
     watch(router.currentRoute, () => {
       currentName.value = router.currentRoute.value.name;
@@ -25,6 +27,11 @@ export default defineComponent({
         if (response.data.success) {
           store.dispatch("setUser", response.data.data)
           account.value = response.data.data;
+          if (response.data.data?.avatar) {
+            avatar.value = URL_IMAGE + response.data.data?.avatar;
+          } else {
+            avatar.value = IMAGE_DEFAULT;
+          }
         } else {
           router.push("/admin/login");
           localStorage.setItem("token", "");
@@ -32,6 +39,15 @@ export default defineComponent({
       } catch (e) {
         router.push("/admin/login");
         localStorage.setItem("token", "");
+      }
+    })
+    
+
+    watch(store.state, () => {
+      if (store.state.user.avatar) {
+        avatar.value = URL_IMAGE + store.state.user.avatar;
+      } else {
+        avatar.value = IMAGE_DEFAULT;
       }
     })
 
@@ -66,6 +82,12 @@ export default defineComponent({
           page: 1
         }
       },
+      {
+        label: 'Tài khoản',
+        link: "Profile",
+        icon: "ic:round-account-circle",
+        params: {}
+      },
     ]);
 
     const changeBars = ref(false);
@@ -78,7 +100,8 @@ export default defineComponent({
       account,
       URL_IMAGE,
       handleBars,
-      changeBars
+      changeBars,
+      avatar
     }
   },
 })
@@ -90,7 +113,7 @@ export default defineComponent({
     <div class="admin d-flex">
       <div class="side-bar">
         <div class="text-light pt-3 pb-3 text-center user-role">
-          <img :src="URL_IMAGE + account?.avatar" alt="">
+          <img :src="avatar" alt="">
         </div>
         <ul class="nav flex-column" role="tablist">
           <li v-for="item in menu"

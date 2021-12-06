@@ -7,6 +7,7 @@ import Category from "../views/Category/index.vue";
 import Book from "../views/Book/index.vue";
 import User from "../views/User/index.vue";
 import NotFound from "../views/Components/NotFound/index.vue";
+import Profile from "../views/Profile/index.vue";
 
 const routes: Array<RouteRecordRaw> = [
   {
@@ -38,6 +39,11 @@ const routes: Array<RouteRecordRaw> = [
         path: "user/page/:page(\\d+)",  
         name: "User",
         component: User
+      },
+      {
+        path: "profile",  
+        name: "Profile",
+        component: Profile
       }
     ],
   },

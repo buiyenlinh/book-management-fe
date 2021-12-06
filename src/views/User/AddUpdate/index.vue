@@ -433,13 +433,13 @@ export default defineComponent({
         </div>
         <div class="modal-footer">
           <button type="button"
-            class="btn btn-info btn-sm rounded-0"
+            class="btn btn-info btn-sm"
             @click="onSubmit">
             <span v-if="addUpdateUserLoading" class="spinner-border spinner-border-sm"/>
             {{ user?.id ? 'Cập nhật' : 'Thêm' }}
           </button>
           <button type="button"
-            class="btn btn-secondary btn-sm rounded-0"
+            class="btn btn-secondary btn-sm"
             data-dismiss="modal"
             id="close-modal-user"
             @click="closeModal">Đóng</button>
