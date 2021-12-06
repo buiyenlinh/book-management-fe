@@ -5,6 +5,8 @@ import API from "../../services"
 import { useStore } from "vuex";
 import { Icon } from '@iconify/vue';
 import { base } from "@/services/base"
+import UseLogout from "../Logout/UseLogout";
+import { notify } from "@kyvg/vue3-notification";
 
 export default defineComponent({
   components: {
@@ -12,6 +14,7 @@ export default defineComponent({
   },
   setup() {
     const { URL_IMAGE, IMAGE_DEFAULT } = base();
+    const { logout, logoutLoading } = UseLogout();
     const store = useStore();
     const account = ref();
     const avatar = ref('');
@@ -94,6 +97,23 @@ export default defineComponent({
     const handleBars = () => {
       changeBars.value = !changeBars.value;
     }
+
+    const handleLogout = () => {
+      logout().then(function(response) {
+        document.getElementById('close-modal-logout')?.click();
+        router.push("/admin/login");
+        localStorage.setItem("token", "");
+      }).catch(function(error) {
+        notify({
+          title: error?.response?.data?.errors,
+          type: "warn"
+        });
+        logoutLoading.value = false;
+      }).finally (function () {
+        logoutLoading.value = false;
+      })
+    }
+
     return {
       menu,
       currentName,
@@ -101,7 +121,9 @@ export default defineComponent({
       URL_IMAGE,
       handleBars,
       changeBars,
-      avatar
+      avatar,
+      handleLogout,
+      logoutLoading
     }
   },
 })
@@ -137,7 +159,7 @@ export default defineComponent({
         <div class="content-header">
           <div class="d-flex justify-content-between">
             <Icon icon="uis:bars"  width="40" @click="handleBars" style="cursor: pointer" />
-            <b style="padding: 7px 0px; cursor: pointer">
+            <b style="padding: 7px 0px; cursor: pointer" data-toggle="modal" data-target="#logout-modal">
               <Icon icon="ant-design:logout-outlined" width="20" style="margin-bottom: 4px" />
               Đăng xuất
             </b>
@@ -148,6 +170,28 @@ export default defineComponent({
             <router-view/>
           </div>
         </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal fade" id="logout-modal">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h4 class="modal-title">Thông báo</h4>
+          <button type="button" class="close" data-dismiss="modal">&times;</button>
+        </div>
+        <div class="modal-body">
+          Bạn có muốn đăng xuất không?
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-danger btn-sm" @click="handleLogout">
+            <span v-if="logoutLoading" class="spinner-border spinner-border-sm"/>
+            Đăng xuất
+          </button>
+          <button type="button" class="btn btn-secondary btn-sm" id="close-modal-logout" data-dismiss="modal">Hủy</button>
+        </div>
+        
       </div>
     </div>
   </div>
