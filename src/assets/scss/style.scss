@@ -15,3 +15,11 @@ body {
     }
   }
 }
+
+
+@media screen and (max-width: 850px) {
+  .profile-avatar img {
+    width: 150px !important;
+    height: 150px !important;
+  }
+}

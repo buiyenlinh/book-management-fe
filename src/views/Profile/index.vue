@@ -202,7 +202,7 @@ export default defineComponent({
 <template>
   <div class="profile">
     <div class="row">
-      <div class="col-md-3 col-sm-12">
+      <div class="col-12 col-md-3 col-sm-12">
         <div class="profile-avatar text-center">
           <img :src="avatar_preview" alt="" style="width: 200px; height: 200px; object-fit: cover; border-radius: 50%">
         </div>
@@ -225,10 +225,10 @@ export default defineComponent({
           </div>
         </div>
       </div>
-      <div class="col-md-9 col-sm-12">
+      <div class="col-12 col-md-9 col-sm-12">
         <div class="profile-form">
           <div class="row">
-            <div class="col-md-6">
+            <div class="col-12 col-md-6 col-sm-12">
               <div class="form-group">
                 <label for="">Họ tên <span class="text-danger">*</span></label>
                 <input type="text" class="form-control" v-model="fullname" @keyup="checkFullname">
@@ -238,7 +238,7 @@ export default defineComponent({
               </div>
             </div>
 
-            <div class="col-md-6">
+            <div class="col-12 col-md-6 col-sm-12">
               <div class="form-group">
                 <label for="">Tên đăng nhập <span class="text-danger">*</span></label>
                 <input type="text" class="form-control" v-model="username" @keyup="checkUsername">
@@ -248,7 +248,7 @@ export default defineComponent({
               </div>
             </div>
 
-            <div class="col-md-6">
+            <div class="col-12 col-md-6 col-sm-12">
               <div class="form-group">
                 <label for="">Mật khẩu <span class="text-danger">*</span></label>
                 <input type="password" class="form-control" v-model="password" @keyup="checkPassword">
@@ -258,7 +258,7 @@ export default defineComponent({
               </div>
             </div>
 
-            <div class="col-md-6">
+            <div class="col-12 col-md-6 col-sm-12">
               <div class="form-group">
                 <label for="">Địa chỉ <span class="text-danger">*</span></label>
                 <input type="text" class="form-control" v-model="address" @keyup="checkAddress">
@@ -268,7 +268,7 @@ export default defineComponent({
               </div>
             </div>
 
-            <div class="col-md-6">
+            <div class="col-12 col-md-6 col-sm-12">
               <div class="form-group">
                 <label for="">Ngày sinh <span class="text-danger">*</span></label>
                 <input type="date" class="form-control" v-model="birthday" @change="checkBirthday">
@@ -278,7 +278,7 @@ export default defineComponent({
               </div>
             </div>
 
-            <div class="col-md-6">
+            <div class="col-12 col-md-6 col-sm-12">
               <div class="form-group">
                 <label for="">Giới tính <span class="text-danger">*</span></label><br>
                 <div class="form-check-inline">
@@ -302,7 +302,7 @@ export default defineComponent({
               </div>
             </div>
 
-            <div class="col-md-6">
+            <div class="col-12 col-md-6 col-sm-12">
               <button class="btn btn-info btn" @click="onSubmit">
                 <span v-if="updateProfileLoading" class="spinner-border spinner-border-sm"/>
                 Cập nhật
