@@ -18,6 +18,7 @@ export default defineComponent({
     const { getCategoryAllList } = UseCategory();
     const store = useStore();
     const handleGetBookList = inject<() => void>("handleGetBookList");
+    const resetItemBook = inject<() => void>("resetItemBook");
     const { URL_IMAGE } = base();
     const book = ref();
     const title = ref();
@@ -148,6 +149,9 @@ export default defineComponent({
     })
     const closeModal = () => {
       console.log("Close");
+      if (resetItemBook) {
+        resetItemBook();
+      }
       mp3_name_preview.value = "";
       mp3_preview.value = "";
       book.value = "";
