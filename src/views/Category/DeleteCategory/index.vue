@@ -36,10 +36,17 @@ export default defineComponent({
             document.getElementById("close-modal-delete-category")?.click();
           }).catch(function(error) {
             deleteCategoryLoading.value = false;
-            notify({
-              title: error?.response?.data?.errors?.name,
-              type: "warn"
-            });
+            if (error?.response?.data?.errors?.name) {
+              notify({
+                title: error?.response?.data?.errors?.name,
+                type: "warn"
+              });
+            } else {
+              notify({
+                title: error?.response?.data?.errors,
+                type: "warn"
+              });
+            }
           }).finally(function() {
             deleteCategoryLoading.value = false;
           })
