@@ -96,12 +96,12 @@ export default defineComponent({
         </thead>
         <tbody>
           <tr v-for="item in bookList?.data" :key="item.id">
-            <td>{{ item.title }}</td>
-            <td>{{ item.author }}</td>
-            <td>{{ item.language }}</td>
-            <td>{{ item.producer }}</td>
-            <td>{{ item.category.name }}</td>
-            <td>{{ item.username }}</td>
+            <td>{{ item?.title }}</td>
+            <td>{{ item?.author?.fullname }}</td>
+            <td>{{ item?.language }}</td>
+            <td>{{ item?.producer }}</td>
+            <td>{{ item?.category?.name }}</td>
+            <td>{{ item?.username }}</td>
             <td>{{ formatDate(item.created_at) }}</td>
             <td>{{ formatDate(item.updated_at) }}</td>
             <td>

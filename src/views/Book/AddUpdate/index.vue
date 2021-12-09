@@ -1,76 +1,128 @@
 <script lang="ts">
+import { defineComponent, ref, inject, PropType, watch } from "vue";
 import UseCategory from '@/views/Category/UseCategory';
-import { defineComponent, inject, PropType, ref, watch } from 'vue'
-import UseBook from "../UseBook"
 import { useStore } from "vuex";
+import UseBook from "../UseBook";
 import { notify } from "@kyvg/vue3-notification";
-import { BookInterface } from "../../Type/index"
-import { base } from "@/services/base"
+import { BookInterface } from "../../Type/index";
+import { base } from "@/services/base";
+import moment from "moment";
+
+type contentType = {
+  id: number | null,
+  title: string,
+  content: string
+}
 
 export default defineComponent({
+  name: "AddUpdateBook",
   props: {
     itemBook: {
       type: Object as PropType<BookInterface>
     }
   },
   setup(props) {
-    const { addUpdateBookLoading, addBook, updateBook } = UseBook();
-    const { getCategoryAllList } = UseCategory();
     const store = useStore();
+    const { addUpdateBookLoading, addBook, updateBook } = UseBook();
     const handleGetBookList = inject<() => void>("handleGetBookList");
     const resetItemBook = inject<() => void>("resetItemBook");
     const { URL_IMAGE } = base();
     const book = ref();
+
     const title = ref();
     const describe = ref();
-    const language = ref();
-    const page_total = ref();
+    const language = ref('Tiếng việt');
+    const release_time = ref();
     const cover_image = ref();
     const producer = ref();
-    const author = ref();
-    const content = ref();
+    const author_id = ref();
     const mp3 = ref();
     const category_id = ref();
     const status = ref(1);
+    const content = ref<contentType[]>([]);
+    const categoryList = ref();
+
     const error = ref({
       title: '',
       describe: '',
       language: '',
-      page_total: '',
+      release_time: '',
       cover_image: '',
       producer: '',
-      author: '',
+      author_id: '',
       content: '',
       mp3: '',
       category_id: '',
-    });
+      status: ''
+    }); 
+
+    const { getCategoryAllList } = UseCategory();
+    const addContent = () => {
+      content.value.push({id: null, title: '', content: ''});
+    }
+    
+    getCategoryAllList().then(function(response) {
+      categoryList.value = response.data;
+    })
+
+    watch(() => props.itemBook, (newItem, oldItem) => {
+      book.value = newItem;
+      title.value = newItem?.title;
+      describe.value = newItem?.describe;
+      language.value = '' + newItem?.language;
+      release_time.value = moment(newItem?.release_time).format('YYYY-MM-DD');
+      cover_image.value = newItem?.cover_image;
+      producer.value = newItem?.producer;
+      author_id.value = newItem?.author?.id;
+      
+      if (newItem?.content) {
+        content.value = newItem?.content;
+      }
+      mp3.value = newItem?.mp3;
+      category_id.value = newItem?.category?.id;
+      status.value = Number(newItem?.status);
+
+      if (cover_image.value) {
+        coverPreview.value = URL_IMAGE + cover_image.value;
+      }
+      if (mp3.value) {
+        mp3_preview.value = URL_IMAGE + mp3.value;
+      }
+    })
 
     const onSubmit = () => {
+      console.log(book.value);
       checkTitle();
-      checkDescribe();
-      checkLanguage();
-      checkPage_total();
-      checkProducer();
       checkAuthor();
-      checkContent();
-      if (!category_id.value) {
-        error.value.category_id = "Loại truyện là bắt buộc";
+      checkCategory();
+      checkReleaseTime();
+
+      if (language.value != "Tiếng việt" && language.value != "Tiếng anh") {
+        error.value.language = "Vui lòng chọn tiếng việt hoặc tiếng anh";
+      } else {
+        error.value.language = "";
       }
-      
-      if (title.value && describe.value && language.value && page_total.value && author.value && content.value && page_total.value > 0 && error.value.mp3 == "" && error.value.cover_image == "") {
+
+      if (status.value != 0 && status.value != 1) {
+        error.value.status = "Trạng thái lựa chọn không hợp lệ";
+      } else {
+        error.value.status = "";
+      }
+
+      if (error.value.title == "" && error.value.author_id == "" && error.value.language == "" && error.value.release_time == "" && error.value.category_id == "" && error.value.status == "") {
         const formData = new FormData();
         formData.append('title', title.value);
         formData.append('describe', describe.value);
         formData.append('language', language.value);
-        formData.append('page_total', page_total.value);
+        formData.append('release_time', release_time.value);
         formData.append('cover_image', cover_image.value);
         formData.append('producer', producer.value);
-        formData.append('author', author.value);
-        formData.append('content', content.value);
+        formData.append('author_id', author_id.value);
         formData.append('mp3', mp3.value);
         formData.append('category_id', category_id.value);
         formData.append('status', '' + status.value);
         formData.append('username', store.state.user.username);
+        formData.append('content', JSON.stringify(content.value));
 
         if (book.value?.id) {
           updateBook(book.value?.id, formData).then(function(response) {
@@ -85,70 +137,39 @@ export default defineComponent({
             document.getElementById("close-modal-book")?.click();
           }).catch(function(error) {
             addUpdateBookLoading.value = false;
-            if (error?.response?.data?.errors) {
-              notify({
-                title: error?.response?.data?.errors,
-                type: "warn"
-              });
-            } else {
-              notify({
-                title: error?.response?.data?.errors?.title[0],
-                type: "warn"
-              });
-            }
+            notify({
+              title: error?.response?.data?.errors?.title[0],
+              type: "warn"
+            });
           }).finally(function() {
             addUpdateBookLoading.value = false;
           })
         } else {
           addBook(formData).then(function(response) {
-            addUpdateBookLoading.value = true;
-            notify({
-                title: response?.data?.message,
-                type: "success"
-              });
-            if(handleGetBookList) {
-              handleGetBookList();
-            }
-            document.getElementById("close-modal-book")?.click();
-          }).catch(function(error) {
-            addUpdateBookLoading.value = false;
-            if (error?.response?.data?.errors) {
-              notify({
-                title: error?.response?.data?.errors,
-                type: "warn"
-              });
-            } else {
-              notify({
-                title: error?.response?.data?.errors?.title[0],
-                type: "warn"
-              });
-            }
-          }).finally(function() {
-            addUpdateBookLoading.value = false;
-          })
+          addUpdateBookLoading.value = true;
+          notify({
+              title: response?.data?.message,
+              type: "success"
+            });
+          if(handleGetBookList) {
+            handleGetBookList();
+          }
+          document.getElementById("close-modal-book")?.click();
+        }).catch(function(error) {
+          addUpdateBookLoading.value = false;
+          notify({
+            title: error?.response?.data?.errors?.title[0],
+            type: "warn"
+          });
+        }).finally(function() {
+          addUpdateBookLoading.value = false;
+        })
         }
       }
     }
 
-    watch(() => props.itemBook, (newItem, oldItem) => {
-      book.value = newItem;
-      title.value = newItem?.title;
-      describe.value = newItem?.describe;
-      language.value = newItem?.language;
-      page_total.value = newItem?.page_total;
-      cover_image.value = newItem?.cover_image;
-      producer.value = newItem?.producer;
-      author.value = newItem?.author;
-      content.value = newItem?.content;
-      mp3.value = newItem?.mp3;
-      category_id.value = newItem?.category?.id;
-      status.value = Number(newItem?.status);
 
-      coverPreview.value = URL_IMAGE + cover_image.value;
-      mp3_preview.value = URL_IMAGE + mp3.value;
-    })
     const closeModal = () => {
-      console.log("Close");
       if (resetItemBook) {
         resetItemBook();
       }
@@ -157,79 +178,20 @@ export default defineComponent({
       book.value = "";
       title.value = "";
       describe.value = "";
-      language.value = "";
-      page_total.value = "";
+      language.value = "Tiếng việt";
+      release_time.value = "";
       cover_image.value = "";
       producer.value = "";
-      author.value = "";
-      content.value = "";
+      author_id.value = "";
+      content.value = [];
       mp3.value = "";
       category_id.value = "";
-      status.value=  1;
-    }
-
-    const checkTitle = () => {
-      if (title.value == "" || title.value == null) {
-        error.value.title = "Tên sách là bắt buộc";
-      } else {
-        error.value.title = "";
-      }
-    }
-
-    const checkDescribe = () => {
-      if (describe.value == "" || describe.value == null) {
-        error.value.describe = "Mô tả là bắt buộc";
-      } else {
-        error.value.describe = "";
-      }
-    }
-
-    const checkLanguage = () => {
-      if (language.value == "" || language.value == null) {
-        error.value.language = "Ngôn ngữ là bắt buộc";
-      } else {
-        error.value.language = "";
-      }
-    }
-
-    const checkPage_total = () => {
-      if (page_total.value == "" || page_total.value == null) {
-        error.value.page_total = "Tổng số trang là bắt buộc";
-      } else if (page_total.value <= 0) {
-        error.value.page_total = "Tổng số trang phải lớn hơn 0";
-      } else {
-        error.value.page_total = "";
-      }
-    }
-
-    const checkProducer = () => {
-      if (producer.value == "" || producer.value == null) {
-        error.value.producer = "Nhà sản xuất là bắt buộc";
-      } else {
-        error.value.producer = "";
-      }
-    }
-
-    const checkAuthor = () => {
-      if (author.value == "" || author.value == null) {
-        error.value.author = "Tác giả là bắt buộc";
-      } else {
-        error.value.author = "";
-      }
-    }
-
-    const checkContent = () => {
-      if (content.value == "" || content.value == null) {
-        error.value.content = "Nội dung là bắt buộc";
-      } else {
-        error.value.content = "";
-      }
+      status.value =  1;
     }
 
     const coverPreview = ref();
     const mp3_preview = ref('');
     const handleChangeCover = (event: any) => {
-      console.log(event?.target.files[0]);
       if (event?.target.files[0].type != "image/jpeg" && event?.target.files[0].type != "image/png" && event?.target.files[0].type != "image/jpg") {
         error.value.cover_image = "Vui lòng chọn ảnh có phần mở rộng 'jpg', 'png', jpeg'";
       } else {
@@ -251,26 +213,67 @@ export default defineComponent({
       mp3_name_preview.value = event?.target?.files[0].name;
     }
 
-    const categoryList = ref();
-    getCategoryAllList().then(function(response) {
-      categoryList.value = response.data;
-    })
-    
+    const checkTitle = () => {
+      if (title.value == "" || title.value == null) {
+        error.value.title = "Tên sách là bắt buộc";
+      } else {
+        error.value.title = "";
+      }
+    }
+
+    const checkAuthor = () => {
+      if (author_id.value == "" || author_id.value == null || Number(author_id.value) <= 0) {
+        error.value.author_id = "Tác giả là bắt buộc";
+      } else {
+        error.value.author_id = "";
+      }
+    }
+
+    const checkCategory = () => {
+      if (category_id.value == "" || category_id.value == null || Number(category_id.value) <= 0) {
+        error.value.category_id = "Loại sách là bắt buộc";
+      } else {
+        error.value.category_id = "";
+      }
+    }
+
+    const checkReleaseTime = () => {
+      if (release_time.value == "" || release_time.value == null  ) {
+        error.value.release_time = "Thời gian phát hành là bắt buộc";
+      } else {
+        error.value.release_time = "";
+      }
+    }
+
+
     return {
-      addUpdateBookLoading,
-      closeModal,
-      onSubmit,
-      book, title, describe, language, page_total, cover_image, producer,
-      author, content, mp3, category_id, status,
-      error,
-      checkTitle, checkDescribe, checkLanguage, checkPage_total,
-      checkProducer, checkAuthor, checkContent,
+      addContent,
       handleChangeCover,
-      categoryList,
-      coverPreview,
       handleChangeMp3,
+      onSubmit,
+      checkTitle,
+      checkAuthor,
+      checkCategory,
+      checkReleaseTime,
+      closeModal,
+      addUpdateBookLoading,
+      book,
+      coverPreview,
       mp3_preview,
-      mp3_name_preview
+      content,
+      mp3_name_preview,
+      categoryList,
+      title,
+      describe,
+      language,
+      release_time,
+      cover_image,
+      producer,
+      author_id,
+      mp3,
+      category_id,
+      status,
+      error
     }
   },
 })
@@ -285,168 +288,187 @@ export default defineComponent({
           <h4 class="modal-title">Sách</h4>
         </div>
         <div class="modal-body">
-          <form action="">
-            <div class="row">
-              <div class="col-md-6">
-                <div class="form-group">
-                  <label for="">Tên sách <span class="text-danger">*</span></label>
-                  <input type="text" class="form-control" v-model="title" @keyup="checkTitle">
-                  <div class="pt-2">
-                    <i class="text-danger error">{{ error?.title }}</i>
-                  </div>
-                </div>
-              </div>
-
-              <div class="col-md-6">
-                <div class="form-group">
-                  <label for="">Ngôn ngữ <span class="text-danger">*</span></label>
-                  <input type="text" class="form-control" v-model="language" @keyup="checkLanguage">
-                  <div class="pt-2">
-                    <i class="text-danger error">{{ error?.language }}</i>
-                  </div>
-                </div>
-              </div>
-
-              <div class="col-md-6">
-                <div class="form-group">
-                  <label for="">Tác giả <span class="text-danger">*</span></label>
-                  <input type="text" class="form-control" v-model="author" @keyup="checkAuthor">
-                  <div class="pt-2">
-                    <i class="text-danger error">{{ error?.author }}</i>
-                  </div>
-                </div>
-              </div>
-              <div class="col-md-6">
-                <div class="form-group">
-                  <label for="">Tổng số trang <span class="text-danger">*</span></label>
-                  <input type="number" class="form-control" v-model="page_total" @keyup="checkPage_total">
-                  <div class="pt-2">
-                    <i class="text-danger error">{{ error?.page_total }}</i>
-                  </div>
-                </div>
-              </div>
-
-              <div class="col-md-6">
-                <div class="form-group">
-                  <label for="">Nhà sản xuất <span class="text-danger">*</span></label>
-                  <input type="text" class="form-control" v-model="producer" @keyup="checkProducer">
-                  <div class="pt-2">
-                    <i class="text-danger error">{{ error?.producer }}</i>
-                  </div>
-                </div>
-              </div>
-
-              <div class="col-md-6">
-                <div class="form-group">
-                  <label for="">Loại sách <span class="text-danger">*</span></label>
-                  <select id="" class="form-control" v-model="category_id">
-                    <option v-for="item in categoryList" :key="item.id" :value="item.id">{{ item.name }}</option>
-                  </select>
-                  <div class="pt-2">
-                    <i class="text-danger error">{{ error?.category_id }}</i>
-                  </div>
-                </div>
-              </div>
-
-              <div class="col-md-6">
-                <div class="form-group">
-                  <label for="">Trạng thái <span class="text-danger">*</span></label><br>
-                  <div class="form-check-inline">
-                    <label class="form-check-label">
-                      <input type="radio" class="form-check-input" value="1" v-model="status">Kích hoạt
-                    </label>
-                  </div>
-                  <div class="form-check-inline">
-                    <label class="form-check-label">
-                      <input type="radio" class="form-check-input" value="0" v-model="status">Không kích hoạt
-                    </label>
-                  </div>
-                  <div class="pt-2">
-                    <i class="text-danger error">{{ error?.status }}</i>
-                  </div>
-                </div>
-              </div>
-
-              <div class="col-md-6">
-                <div class="form-group">
-                  <label for="">Bìa sách <span class="text-danger">*</span></label><br>
-                   <button type="button" class="btn btn-info btn-sm" @click="$refs.RefCoverImage.click()">
-                    Chọn ảnh
-                  </button>
-
-                  <input
-                    type="file"
-                    ref="RefCoverImage"
-                    style="display: none"
-                    @change="handleChangeCover"
-                  />
-                  <div class="mt-1">
-                    <img v-if="coverPreview" :src="coverPreview" alt="" style="width: 150px; height: 100px; object-fit: cover">
-                  </div>
-                  <div class="pt-2">
-                    <i class="text-danger error">{{ error?.cover_image }}</i>
-                  </div>
-                </div>
-              </div>
-
-              <div class="col-md-6">
-                <div class="form-group">
-                  <label for="">mp3 <span class="text-danger">*</span></label><br>
-                  <button type="button" class="btn btn-info btn-sm" @click="$refs.RefMp3.click()">
-                    Chọn mp3
-                  </button>
-
-                  <input
-                    type="file"
-                    ref="RefMp3"
-                    style="display: none"
-                    @change="handleChangeMp3"
-                  />
-
-                  <div class="mt-1">
-                    <div v-if="mp3_name_preview" >File vừa chọn: {{ mp3_name_preview }}</div>
-                    <audio controls v-if="mp3_preview  != ''">
-                      <source :src="mp3_preview" type="audio/mpeg">
-                    </audio>
-                  </div>
-
-                  <div class="pt-2">
-                    <i class="text-danger error">{{ error?.mp3 }}</i>
-                  </div>
-                </div>
-              </div>
-
-              <div class="col-md-12">
-                <div class="form-group">
-                  <label for="">Mô tả <span class="text-danger">*</span></label>
-                  <textarea class="form-control" v-model="describe" rows="3" @keyup="checkDescribe"></textarea>
-                  <div class="pt-2">
-                    <i class="text-danger error">{{ error?.describe }}</i>
-                  </div>
-                </div>
-              </div>
-
-              <div class="col-md-12">
-                <div class="form-group">
-                  <label for="">Nội dung <span class="text-danger">*</span></label>
-                  <textarea class="form-control" rows="5" v-model="content" @keyup="checkContent"></textarea>
-                  <div class="pt-2">
-                    <i class="text-danger error">{{ error?.content }}</i>
-                  </div>
+          <div class="row">
+            <div class="col-md-6">
+              <div class="form-group">
+                <label for=""><b>Tên sách </b><span class="text-danger">*</span></label>
+                <input type="text" class="form-control" v-model="title" @keyup="checkTitle">
+                <div class="pt-2">
+                  <i class="text-danger error">{{ error?.title }}</i>
                 </div>
               </div>
             </div>
-          </form>
+
+            <div class="col-md-6">
+              <div class="form-group">
+                <label for=""><b>Ngôn ngữ </b><span class="text-danger">*</span></label><br>
+                <div class="form-check-inline">
+                  <label class="form-check-label">
+                    <input type="radio" class="form-check-input" value="Tiếng việt" v-model="language">Tiếng việt
+                  </label>
+                </div>
+                <div class="form-check-inline">
+                  <label class="form-check-label">
+                    <input type="radio" class="form-check-input" value="Tiếng anh" v-model="language">Tiếng anh
+                  </label>
+                </div>
+                <div class="pt-2">
+                  <i class="text-danger error">{{ error?.language }}</i>
+                </div>
+              </div>
+            </div>
+
+            <div class="col-md-6">
+              <div class="form-group">
+                <label for=""><b>Loại sách </b><span class="text-danger">*</span></label>
+                <select id="" class="form-control" v-model="category_id" @change="checkCategory">
+                  <option v-for="item in categoryList" :key="item.id" :value="item.id">{{ item.name }}</option>
+                </select>
+                <div class="pt-2">
+                  <i class="text-danger error">{{ error?.category_id }}</i>
+                </div>
+              </div>
+            </div>
+
+             <div class="col-md-6">
+              <div class="form-group">
+                <label for=""><b>Tác giả </b><span class="text-danger">*</span></label>
+                <select class="form-control" v-model="author_id" @change="checkAuthor">
+                  <option value="1">TG test</option>
+                </select>
+                <div class="pt-2">
+                  <i class="text-danger error">{{ error?.author_id }}</i>
+                </div>
+              </div>
+            </div>
+
+            <div class="col-md-6">
+              <div class="form-group">
+                <label for=""><b>Nhà xuất bản </b></label>
+                <input type="text" class="form-control" v-model="producer">
+                <div class="pt-2">
+                  <i class="text-danger error">{{ error?.producer }}</i>
+                </div>
+              </div>
+            </div>
+
+            <div class="col-md-6">
+              <div class="form-group">
+                <label for=""><b>Thời gian phát hành </b><span class="text-danger">*</span></label>
+                <input type="date" class="form-control" v-model="release_time" @change="checkReleaseTime">
+                <div class="pt-2">
+                  <i class="text-danger error">{{ error?.release_time }}</i>
+                </div>
+              </div>
+            </div>
+
+            <div class="col-md-6">
+              <div class="form-group">
+                <label for=""><b>Bìa sách </b></label><br>
+                  <button type="button" class="btn btn-info btn-sm" @click="$refs.RefCoverImage.click()">
+                  Chọn ảnh
+                </button>
+
+                <input
+                  type="file"
+                  ref="RefCoverImage"
+                  style="display: none"
+                  @change="handleChangeCover"
+                />
+                <div class="mt-1">
+                  <img v-if="coverPreview" :src="coverPreview" alt="" style="width: 150px; height: 100px; object-fit: cover">
+                </div>
+                <div class="pt-2">
+                  <i class="text-danger error">{{ error?.cover_image }}</i>
+                </div>
+              </div>
+            </div>
+
+            <div class="col-md-6">
+              <div class="form-group">
+                <label for=""><b>mp3 </b></label><br>
+                <button type="button" class="btn btn-info btn-sm" @click="$refs.RefMp3.click()">
+                  Chọn mp3
+                </button>
+
+                <input
+                  type="file"
+                  ref="RefMp3"
+                  style="display: none"
+                  @change="handleChangeMp3"
+                />
+
+                <div class="mt-1">
+                  <div v-if="mp3_name_preview" >File vừa chọn: {{ mp3_name_preview }}</div>
+                  <audio controls v-if="mp3_preview  != ''">
+                    <source :src="mp3_preview" type="audio/mpeg">
+                  </audio>
+                </div>
+
+                <div class="pt-2">
+                  <i class="text-danger error">{{ error?.mp3 }}</i>
+                </div>
+              </div>
+            </div>
+
+            <div class="col-md-6">
+              <div class="form-group">
+                <label for=""><b>Trạng thái </b><span class="text-danger">*</span></label><br>
+                <div class="form-check-inline">
+                  <label class="form-check-label">
+                    <input type="radio" class="form-check-input" value="1" v-model="status">Kích hoạt
+                  </label>
+                </div>
+                <div class="form-check-inline">
+                  <label class="form-check-label">
+                    <input type="radio" class="form-check-input" value="0" v-model="status">Không kích hoạt
+                  </label>
+                </div>
+                <div class="pt-2">
+                  <i class="text-danger error">{{ error?.status }}</i>
+                </div>
+              </div>
+            </div>
+
+            <div class="col-md-12">
+              <div class="form-group">
+                <label for=""><b>Mô tả </b></label>
+                <textarea class="form-control" v-model="describe" rows="3" @keyup="checkDescribe"></textarea>
+                <div class="pt-2">
+                  <i class="text-danger error">{{ error?.describe }}</i>
+                </div>
+              </div>
+            </div>
+
+            <div class="col-md-12">
+              <div class="form-group">
+                <label for=""><b>Phần / Chương </b></label><br>
+                <div class="ml-2 mr-2" v-for="(item, index) in content" :key="index">
+                  <label for="" class="ml-2  mt-3">Tiêu đề {{ index + 1 }}</label>
+                  <input type="text" class="form-control" v-model="content[index].title">
+                  <label for="" class="ml-2 mt-3">Nội dung {{ index + 1 }}</label>
+                  <textarea class="form-control" rows="5" v-model="content[index].content"></textarea>
+                </div>
+                <div class="text-center">
+                  <button class="btn btn-info" @click="addContent">+</button>
+                </div>
+                <div class="pt-2">
+                  <i class="text-danger error">{{ error?.content }}</i>
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
+
         <div class="modal-footer">
           <button type="button"
-            class="btn btn-info btn-sm rounded-0"
+            class="btn btn-info btn-sm"
             @click="onSubmit">
             <span v-if="addUpdateBookLoading" class="spinner-border spinner-border-sm"/>
             {{ book?.id ? 'Cập nhật' : 'Thêm' }}
           </button>
           <button type="button"
-            class="btn btn-secondary btn-sm rounded-0"
+            class="btn btn-secondary btn-sm"
             data-dismiss="modal"
             id="close-modal-book"
             @click="closeModal">Đóng</button>

@@ -23,14 +23,25 @@ export interface CategoryInterface {
 }
 
 export interface BookInterface {
-  title: string | null,
+  title: string,
   describe: string | null,
-  language: string | null,
-  page_total: number | null,
+  language: string,
+  release_time: string,
   cover_image: string | null,
   producer: string | null,
-  author: string | null,
-  content: string | null,
+  author: {
+      id: number | null,
+      fullname: string | null,
+      introduce: string | null
+    },
+  content: [
+    {
+      id: number,
+      title: string,
+      content: string,
+      book_id: number
+    }
+  ],
   mp3: string | null,
   category: {
     id: number,

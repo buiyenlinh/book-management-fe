@@ -74,7 +74,7 @@ export default defineComponent({
         </div>
         <div class="modal-footer">
           <button type="button"
-            class="btn btn-info btn-sm rounded-0"
+            class="btn btn-danger btn-sm rounded-0"
             @click="onSubmit">
             <span v-if="deleteBookLoading" class="spinner-border spinner-border-sm"/>
             Xóa
