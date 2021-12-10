@@ -3,7 +3,8 @@ import { defineComponent, ref, provide } from "vue";
 import UseBook from "./UseBook";
 import { notify } from "@kyvg/vue3-notification";
 import moment from "moment";
-import AddUpdate from "./AddUpdate/index.vue"
+import AddUpdate from "./AddUpdate/index.vue";
+import WatchBook from "./WatchBook/index.vue";
 import DeleteBook from "./Delete/index.vue"
 import Pagination from "../Components/Pagination/index.vue";
 import router from "../../router"
@@ -13,7 +14,8 @@ export default defineComponent({
   components: {
     AddUpdate,
     Pagination,
-    DeleteBook
+    DeleteBook,
+    WatchBook
   },
   setup() {
 
@@ -91,7 +93,6 @@ export default defineComponent({
           <th>Loại sách</th>
           <th>Người tạo</th>
           <th>Ngày tạo</th>
-          <th>Cập nhật lần cuối</th>
           <th>Thao tác</th>
         </thead>
         <tbody>
@@ -103,8 +104,13 @@ export default defineComponent({
             <td>{{ item?.category?.name }}</td>
             <td>{{ item?.username }}</td>
             <td>{{ formatDate(item.created_at) }}</td>
-            <td>{{ formatDate(item.updated_at) }}</td>
             <td>
+              <b class="text-primary mr-2"
+                style="cursor: pointer"
+                @click="selectBook(item)"
+                data-toggle="modal"
+                data-target="#watch-book-id">Xem</b>
+
               <b class="text-info mr-2"
                 style="cursor: pointer"
                 @click="selectBook(item)"
@@ -125,6 +131,7 @@ export default defineComponent({
   </div>
   <AddUpdate :itemBook="itemBook" />
   <DeleteBook :itemBook="itemBook" />
+  <WatchBook :itemBook="itemBook" />
 </template>
 
 <style scoped lang="scss">
