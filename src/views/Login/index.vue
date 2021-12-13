@@ -27,7 +27,7 @@ export default defineComponent ({
         login(values)?.then(function(response) {
           loginLoading.value = true;
           localStorage.setItem('token', response?.data?.data?.token);
-          router.push({ name : 'Admin' });
+          router.push({ name : 'DashBoard' });
         }).catch(function(error) {
           loginLoading.value = false;
           notify({
@@ -57,7 +57,7 @@ export default defineComponent ({
 
     onMounted(async() => {
       if (localStorage.getItem('token')) {
-        router.push({name : 'Admin'})
+        router.push({name : 'DashBoard'})
       }
     })
 
