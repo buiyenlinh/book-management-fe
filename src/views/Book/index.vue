@@ -105,7 +105,7 @@ export default defineComponent({
             <td>{{ item?.username }}</td>
             <td>{{ formatDate(item.created_at) }}</td>
             <td>
-              <b class="text-primary mr-2"
+              <b class="text-set-01  mr-2"
                 style="cursor: pointer"
                 @click="selectBook(item)"
                 data-toggle="modal"
