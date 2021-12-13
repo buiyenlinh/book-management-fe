@@ -195,6 +195,20 @@ export default defineComponent({
       mp3.value = "";
       category_id.value = "";
       status.value =  1;
+
+      error.value = {
+        title: '',
+        describe: '',
+        language: '',
+        release_time: '',
+        cover_image: '',
+        producer: '',
+        author_id: '',
+        content: '',
+        mp3: '',
+        category_id: '',
+        status: ''
+      };
     }
 
     const coverPreview = ref();

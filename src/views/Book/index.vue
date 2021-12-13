@@ -45,11 +45,12 @@ export default defineComponent({
     }
 
     const resetItemBook = () => {
-      itemBook.value = null
+      itemBook.value = null;
     }
     provide("handleGetBookList", handleGetBookList);
     provide("handleChangePage", handleChangePage);
     provide("resetItemBook", resetItemBook);
+
     return {
       bookList,
       handleChangePage,
