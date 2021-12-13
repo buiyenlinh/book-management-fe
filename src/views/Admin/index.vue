@@ -78,6 +78,14 @@ export default defineComponent({
         }
       },
       {
+        label: 'Tác giả',
+        link: "Author",
+        icon: "raphael:pen",
+        params: {
+          page: 1
+        }
+      },
+      {
         label: 'Người dùng',
         link: "User",
         icon: "fa-solid:users",
