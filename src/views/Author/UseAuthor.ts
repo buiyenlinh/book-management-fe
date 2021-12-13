@@ -5,6 +5,10 @@ import { AuthorInterface } from "../Type/index";
 export default function UseAuthor() {
   const addUpdateAuthorLoading = ref(false);
   const deleteAuthorLoading = ref(false);
+  const getAuthorListAll = async () => {
+    return await API.get(`author/all`);
+  }
+
   const getAuthorList = async (page: number) => {
     return await API.get(`author?page=${page}`);
   }
@@ -30,6 +34,7 @@ export default function UseAuthor() {
     updateAuthor,
     deleteAuthor,
     addUpdateAuthorLoading,
-    deleteAuthorLoading
+    deleteAuthorLoading,
+    getAuthorListAll
   }
 }
