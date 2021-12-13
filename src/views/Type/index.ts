@@ -64,3 +64,8 @@ export interface UserInterface {
   },
   active: number | null,
 }
+
+export interface AuthorInterface {
+  fullname: string | null,
+  introduce: string | null
+}
