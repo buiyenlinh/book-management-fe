@@ -90,7 +90,7 @@ export default defineComponent({
       }
     })
 
-    const onSubmit = () => {
+    const onSubmit = () => {  
       console.log(book.value);
       checkTitle();
       checkAuthor();
