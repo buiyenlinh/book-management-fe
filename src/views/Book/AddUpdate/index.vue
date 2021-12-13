@@ -7,6 +7,7 @@ import { notify } from "@kyvg/vue3-notification";
 import { BookInterface } from "../../Type/index";
 import { base } from "@/services/base";
 import moment from "moment";
+import UseAuthor from "../../Author/UseAuthor"
 
 type contentType = {
   id: number | null,
@@ -23,6 +24,8 @@ export default defineComponent({
   },
   setup(props) {
     const store = useStore();
+    const { getAuthorListAll } = UseAuthor();
+    const { getCategoryAllList } = UseCategory();
     const { addUpdateBookLoading, addBook, updateBook } = UseBook();
     const handleGetBookList = inject<() => void>("handleGetBookList");
     const resetItemBook = inject<() => void>("resetItemBook");
@@ -41,6 +44,7 @@ export default defineComponent({
     const status = ref(1);
     const content = ref<contentType[]>([]);
     const categoryList = ref();
+    const authorList = ref();
 
     const error = ref({
       title: '',
@@ -56,13 +60,16 @@ export default defineComponent({
       status: ''
     }); 
 
-    const { getCategoryAllList } = UseCategory();
     const addContent = () => {
       content.value.push({id: null, title: '', content: ''});
     }
     
     getCategoryAllList().then(function(response) {
       categoryList.value = response.data;
+    })
+
+    getAuthorListAll().then(function(response) {
+      authorList.value = response;
     })
 
     watch(() => props.itemBook, (newItem, oldItem) => {
