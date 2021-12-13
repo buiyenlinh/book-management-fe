@@ -69,7 +69,8 @@ export default defineComponent({
     })
 
     getAuthorListAll().then(function(response) {
-      authorList.value = response;
+      authorList.value = response.data?.data;
+      console.log(authorList.value);
     })
 
     watch(() => props.itemBook, (newItem, oldItem) => {
@@ -263,6 +264,7 @@ export default defineComponent({
       checkCategory,
       checkReleaseTime,
       closeModal,
+      authorList,
       addUpdateBookLoading,
       book,
       coverPreview,
@@ -341,7 +343,7 @@ export default defineComponent({
               <div class="form-group">
                 <label for=""><b>Tác giả </b><span class="text-danger">*</span></label>
                 <select class="form-control" v-model="author_id" @change="checkAuthor">
-                  <option value="1">TG test</option>
+                  <option v-for="item in authorList?.data" :key="item.id" :value="item?.id">{{ item?.fullname }}</option>
                 </select>
                 <div class="pt-2">
                   <i class="text-danger error">{{ error?.author_id }}</i>
