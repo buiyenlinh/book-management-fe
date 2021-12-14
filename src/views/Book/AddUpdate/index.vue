@@ -24,7 +24,7 @@ export default defineComponent({
   },
   setup(props) {
     const store = useStore();
-    const { getAuthorListAll } = UseAuthor();
+    // const { getAuthorListAll } = UseAuthor();
     const { getCategoryAllList } = UseCategory();
     const { addUpdateBookLoading, addBook, updateBook } = UseBook();
     const handleGetBookList = inject<() => void>("handleGetBookList");
@@ -68,10 +68,10 @@ export default defineComponent({
       categoryList.value = response.data;
     })
 
-    getAuthorListAll().then(function(response) {
-      authorList.value = response.data?.data;
-      console.log(authorList.value);
-    })
+    // getAuthorListAll().then(function(response) {
+    //   authorList.value = response.data?.data;
+    //   console.log(authorList.value);
+    // })
 
     watch(() => props.itemBook, (newItem, oldItem) => {
       book.value = newItem;

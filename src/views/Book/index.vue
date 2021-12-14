@@ -64,8 +64,11 @@ export default defineComponent({
     formatDate(date: Date) {
       return moment(date).format("HH:mm, DD-MM-YYYY");
     },
-    searchAuthor(value: any) {
+    searchAuthor(value: string) {
       console.log(value)
+    },
+    searchBookCategory(value: string) {
+      console.log(value);
     }
   }
 })
@@ -84,13 +87,13 @@ export default defineComponent({
 
       <div class="col-md-3 col-sm-4 col-12 search-author-book">
         <div class="mb-3">
-          <SelectComponent :url="'author/search'" @changeValue="searchAuthor" />
+          <SelectComponent :url="'author/search?fullname='" @changeValue="searchAuthor" :text="'Chọn tác giả...'" />
         </div>
       </div>
 
       <div class="col-md-3 col-sm-4 col-12 search-category-book">
-        <div class="input-group mb-3">
-          <input type="text" class="form-control-sm form-control" placeholder="Nhập loại sách...">
+        <div class="mb-3">
+          <SelectComponent :url="'category/search?name='" @changeValue="searchBookCategory" :text="'Chọn loại sách...'" />
         </div>
       </div>
 
