@@ -75,27 +75,30 @@ export default defineComponent({
 
     watch(() => props.itemBook, (newItem, oldItem) => {
       book.value = newItem;
-      title.value = newItem?.title;
-      describe.value = newItem?.describe;
-      language.value = '' + newItem?.language;
-      release_time.value = moment(newItem?.release_time).format('YYYY-MM-DD');
-      cover_image.value = newItem?.cover_image;
-      producer.value = newItem?.producer;
-      author_id.value = newItem?.author?.id;
-      
-      if (newItem?.content) {
-        content.value = newItem?.content;
-      }
-      mp3.value = newItem?.mp3;
-      category_id.value = newItem?.category?.id;
-      status.value = Number(newItem?.status);
+      if (book.value?.id) {
+        title.value = newItem?.title;
+        describe.value = newItem?.describe;
+        language.value = '' + newItem?.language;
+        release_time.value = moment(newItem?.release_time).format('YYYY-MM-DD');
+        cover_image.value = newItem?.cover_image;
+        producer.value = newItem?.producer;
+        author_id.value = newItem?.author?.id;
+        
+        if (newItem?.content) {
+          content.value = newItem?.content;
+        }
+        mp3.value = newItem?.mp3;
+        category_id.value = newItem?.category?.id;
+        status.value = Number(newItem?.status);
 
-      if (cover_image.value) {
-        coverPreview.value = URL_IMAGE + cover_image.value;
+        if (cover_image.value) {
+          coverPreview.value = URL_IMAGE + cover_image.value;
+        }
+        if (mp3.value) {
+          mp3_preview.value = URL_IMAGE + mp3.value;
+        }
       }
-      if (mp3.value) {
-        mp3_preview.value = URL_IMAGE + mp3.value;
-      }
+      
     })
 
     const onSubmit = () => {  

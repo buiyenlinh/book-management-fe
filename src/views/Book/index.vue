@@ -9,13 +9,15 @@ import DeleteBook from "./Delete/index.vue"
 import Pagination from "../Components/Pagination/index.vue";
 import router from "../../router"
 import { BookInterface } from "../Type/index"
+import SelectComponent from "../Components/Select/index.vue"
 
 export default defineComponent({
   components: {
     AddUpdate,
     Pagination,
     DeleteBook,
-    WatchBook
+    WatchBook,
+    SelectComponent
   },
   setup() {
 
@@ -61,6 +63,9 @@ export default defineComponent({
   methods: {
     formatDate(date: Date) {
       return moment(date).format("HH:mm, DD-MM-YYYY");
+    },
+    searchAuthor(value: any) {
+      console.log(value)
     }
   }
 })
@@ -70,18 +75,30 @@ export default defineComponent({
 <template>
   <div class="book">
     <h4>Danh sách quyển sách</h4>
-
-     <div class="d-flex justify-content-between">
-      <div class="search-Book" style="width: 30%">
+    <div class="row">
+      <div class="col-md-3 col-sm-4 col-12 search-title-book">
         <div class="input-group mb-3">
-          <input type="text" class="form-control-sm form-control rounded-0" placeholder="Nhập tên...">
-          <div class="input-group-append">
-            <button class="btn btn-info rounded-0 btn-sm">Tìm</button>
-          </div>
+          <input type="text" class="form-control-sm form-control" placeholder="Nhập tên sách...">
         </div>
       </div>
-      <div class="add-Book">
-        <button class="btn btn-info btn-sm rounded-0" data-toggle="modal" data-target="#add-update-book-id">Thêm</button>
+
+      <div class="col-md-3 col-sm-4 col-12 search-author-book">
+        <div class="mb-3">
+          <SelectComponent :url="'author/search'" @changeValue="searchAuthor" />
+        </div>
+      </div>
+
+      <div class="col-md-3 col-sm-4 col-12 search-category-book">
+        <div class="input-group mb-3">
+          <input type="text" class="form-control-sm form-control" placeholder="Nhập loại sách...">
+        </div>
+      </div>
+
+      <div class="col-md-2 col-sm-4"> 
+        <button class="btn btn-info btn-sm">Lọc</button>
+      </div>
+      <div class=" col-md-1 col-sm-4 add-Book mb-3 text-right">
+        <button class="btn btn-info btn-sm" data-toggle="modal" data-target="#add-update-book-id">Thêm</button>
       </div>
     </div>
     <div class="table-responsive">
