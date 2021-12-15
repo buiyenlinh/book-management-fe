@@ -1,13 +1,12 @@
 <script lang="ts">
 import { defineComponent, ref, inject, PropType, watch } from "vue";
-import UseCategory from '@/views/Category/UseCategory';
 import { useStore } from "vuex";
 import UseBook from "../UseBook";
 import { notify } from "@kyvg/vue3-notification";
-import { BookInterface } from "../../Type/index";
+import { BookInterface, CategoryInterface } from "../../Type/index";
 import { base } from "@/services/base";
 import moment from "moment";
-import UseAuthor from "../../Author/UseAuthor"
+import SelectComponent from "../../Components/Select/index.vue"
 
 type contentType = {
   id: number | null,
@@ -17,6 +16,9 @@ type contentType = {
 
 export default defineComponent({
   name: "AddUpdateBook",
+  components: {
+    SelectComponent
+  },
   props: {
     itemBook: {
       type: Object as PropType<BookInterface>
@@ -24,11 +26,11 @@ export default defineComponent({
   },
   setup(props) {
     const store = useStore();
-    // const { getAuthorListAll } = UseAuthor();
-    const { getCategoryAllList } = UseCategory();
     const { addUpdateBookLoading, addBook, updateBook } = UseBook();
     const handleGetBookList = inject<() => void>("handleGetBookList");
     const resetItemBook = inject<() => void>("resetItemBook");
+    const textSearch = inject('textSearch') as any;
+    const handleSearchBook = inject<() => void>("handleSearchBook");
     const { URL_IMAGE } = base();
     const book = ref();
 
@@ -45,6 +47,8 @@ export default defineComponent({
     const content = ref<contentType[]>([]);
     const categoryList = ref();
     const authorList = ref();
+    const textShowCategory = ref('Chọn loại sách...');
+    const textShowAuthor = ref('Chọn tác giả...');
 
     const error = ref({
       title: '',
@@ -63,15 +67,14 @@ export default defineComponent({
     const addContent = () => {
       content.value.push({id: null, title: '', content: ''});
     }
-    
-    getCategoryAllList().then(function(response) {
-      categoryList.value = response.data;
-    })
 
-    // getAuthorListAll().then(function(response) {
-    //   authorList.value = response.data?.data;
-    //   console.log(authorList.value);
-    // })
+    const searchBookCategory = (value: CategoryInterface) => {
+      category_id.value = value?.id;
+    }
+
+    const searchAuthor = (value: CategoryInterface) => {
+      author_id.value = value?.id;
+    }
 
     watch(() => props.itemBook, (newItem, oldItem) => {
       book.value = newItem;
@@ -83,6 +86,8 @@ export default defineComponent({
         cover_image.value = newItem?.cover_image;
         producer.value = newItem?.producer;
         author_id.value = newItem?.author?.id;
+        textShowCategory.value = '' + newItem?.category?.name;
+        textShowAuthor.value = '' + newItem?.author?.fullname;
         
         if (newItem?.content) {
           content.value = newItem?.content;
@@ -102,7 +107,6 @@ export default defineComponent({
     })
 
     const onSubmit = () => {  
-      console.log(book.value);
       checkTitle();
       checkAuthor();
       checkCategory();
@@ -120,7 +124,7 @@ export default defineComponent({
         error.value.status = "";
       }
 
-      if (error.value.title == "" && error.value.author_id == "" && error.value.language == "" && error.value.release_time == "" && error.value.category_id == "" && error.value.status == "") {
+      if (error.value.title == "" && error.value.author_id == "" && error.value.language == "" && error.value.release_time == "" && error.value.category_id == "" && error.value.status == "" && error.value.mp3 == "" && error.value.cover_image == "") {
         const formData = new FormData();
         formData.append('title', title.value);
         formData.append('describe', describe.value);
@@ -139,12 +143,20 @@ export default defineComponent({
           updateBook(book.value?.id, formData).then(function(response) {
             addUpdateBookLoading.value = true;
             notify({
-                title: response?.data?.message,
-                type: "success"
-              });
-            if(handleGetBookList) {
-              handleGetBookList();
+              title: response?.data?.message,
+              type: "success"
+            });
+
+            if (textSearch?.value == "") {
+              if(handleGetBookList) {
+                handleGetBookList();
+              }
+            } else {
+              if (handleSearchBook) {
+                handleSearchBook();
+              }
             }
+            
             document.getElementById("close-modal-book")?.click();
           }).catch(function(error) {
             addUpdateBookLoading.value = false;
@@ -184,6 +196,8 @@ export default defineComponent({
       if (resetItemBook) {
         resetItemBook();
       }
+      textShowCategory.value = "Chọn loại sách...";
+      textShowAuthor.value = "Chọn tác giả...";
       mp3_name_preview.value = "";
       mp3_preview.value = "";
       book.value = "";
@@ -272,6 +286,8 @@ export default defineComponent({
 
 
     return {
+      searchBookCategory,
+      searchAuthor,
       addContent,
       handleChangeCover,
       handleChangeMp3,
@@ -281,25 +297,14 @@ export default defineComponent({
       checkCategory,
       checkReleaseTime,
       closeModal,
-      authorList,
-      addUpdateBookLoading,
-      book,
-      coverPreview,
-      mp3_preview,
-      content,
-      mp3_name_preview,
-      categoryList,
-      title,
-      describe,
-      language,
-      release_time,
-      cover_image,
-      producer,
-      author_id,
-      mp3,
-      category_id,
-      status,
-      error
+      authorList, addUpdateBookLoading, book,
+      coverPreview, mp3_preview, content,
+      mp3_name_preview, categoryList,
+      title, describe, language,
+      release_time, cover_image,
+      producer, author_id, mp3,
+      category_id, status, error,
+      textShowCategory, textShowAuthor
     }
   },
 })
@@ -347,9 +352,12 @@ export default defineComponent({
             <div class="col-md-6">
               <div class="form-group">
                 <label for=""><b>Loại sách </b><span class="text-danger">*</span></label>
-                <select id="" class="form-control" v-model="category_id" @change="checkCategory">
-                  <option v-for="item in categoryList" :key="item.id" :value="item.id">{{ item.name }}</option>
-                </select>
+               <SelectComponent
+                  :url="'category/search?name='"
+                  @changeValue="searchBookCategory"
+                  :text="textShowCategory"
+                  :variable="'name'"  
+                />
                 <div class="pt-2">
                   <i class="text-danger error">{{ error?.category_id }}</i>
                 </div>
@@ -359,9 +367,12 @@ export default defineComponent({
              <div class="col-md-6">
               <div class="form-group">
                 <label for=""><b>Tác giả </b><span class="text-danger">*</span></label>
-                <select class="form-control" v-model="author_id" @change="checkAuthor">
-                  <option v-for="item in authorList?.data" :key="item.id" :value="item?.id">{{ item?.fullname }}</option>
-                </select>
+                <SelectComponent
+                  :url="'author/search?fullname='"
+                  @changeValue="searchAuthor"
+                  :text="textShowAuthor"
+                  :variable="'fullname'"
+                />
                 <div class="pt-2">
                   <i class="text-danger error">{{ error?.author_id }}</i>
                 </div>

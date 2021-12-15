@@ -15,6 +15,18 @@ export default {
       type: String,
       default: null
     },
+    variable: {
+      type: String,
+      default: null
+    },
+    size: {
+      type: String,
+      default: null
+    },
+    statusReset: {
+      type: Boolean,
+      default: false
+    }
   },
   data() {
     return {
@@ -25,12 +37,11 @@ export default {
       loading: false
     }
   },
-  
   methods: {
-    search() {  
+    search() {
+      this.loading = true;
       API.get(this.url + this.textSearch).then(response => {
         this.list = response.data?.data?.data;
-        this.loading = true;
       }).catch(() => {
         this.loading = false;
       }).finally(() => {
@@ -38,12 +49,27 @@ export default {
       })
     },
     setValue(item) {
-      this.val = item.fullname;
-      this.$emit('changeValue', item.id);
+      this.val = item[this.variable];
+      this.$emit('changeValue', item);
       this.show = false;
     },
     showDropdown() {
       this.show = !this.show;
+    },
+    cancel() {
+      this.val = this.text,
+      this.textSearch = '',
+      this.list = {},
+      this.show = false,
+      this.loading = false
+    }
+  },
+  watch: {
+    statusReset(newStatusReset, oldStatusReset) {
+      this.cancel();
+    },
+    text(newText, oldText) {
+      this.val = newText;
     }
   }
 }
@@ -52,16 +78,16 @@ export default {
 
 <template>
   <div class="select-component">
-    <div class="form-control form-control-sm" @click="showDropdown">
+    <div :class="[size == 'sm' ? 'form-control-sm' : '', 'form-control']" @click="showDropdown">
       <span>{{ val }}</span>
       <Icon :class="[this.show ? 'select-icon-transition' : '' , 'select-icon-bottom']" icon="ep:caret-bottom" />
     </div>
     <div class="select-dropdown" v-if="show">
-      <input type="text" class="form-control form-control-sm" v-model="textSearch" @input="search()">
+      <input type="text" :class="[size == 'sm' ? 'form-control-sm' : '', 'form-control']" v-model="textSearch" @input="search()">
       <div v-if="loading" class="loading spinner-border spinner-border-sm"></div>
       <ul class="mt-2">
         <li v-for="(item, i) in list" :key="i">
-          <a @click="setValue(item)">{{ item.fullname }}</a>
+          <a @click="setValue(item)">{{ item[variable] }}</a>
         </li>
       </ul>
     </div>
@@ -83,7 +109,6 @@ export default {
     transition: all ease-in-out 0.4s;
   }
 }
-
 
 .select-dropdown {
   border: 1px solid #ddd;

@@ -4,6 +4,7 @@ import { ref } from "vue";
 export default function UseBook () {
   const addUpdateBookLoading = ref(false);
   const deleteBookLoading = ref(false);
+  const searchBookLoading = ref(false);
 
   const getBookList = (page: number) => {
     return API.get(`book?page=${page}`);
@@ -24,12 +25,19 @@ export default function UseBook () {
     return API.delete(`book/${id}`);
   }
 
+  const searchBook = (text: string, page: number) => {
+    searchBookLoading.value = true;
+    return API.get(`book/search?${text}&page=${page}`);
+  }
+
   return {
     getBookList,
     addBook,
     updateBook,
     deleteBook,
+    searchBookLoading,
     addUpdateBookLoading,
-    deleteBookLoading
+    deleteBookLoading,
+    searchBook
   }
 }
