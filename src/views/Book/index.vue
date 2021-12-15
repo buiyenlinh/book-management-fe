@@ -8,20 +8,28 @@ import WatchBook from "./WatchBook/index.vue";
 import DeleteBook from "./Delete/index.vue"
 import Pagination from "../Components/Pagination/index.vue";
 import router from "../../router"
-import { BookInterface } from "../Type/index"
+import { BookInterface, CategoryInterface } from "../Type/index"
+import SelectComponent from "../Components/Select/index.vue"
 
 export default defineComponent({
   components: {
     AddUpdate,
     Pagination,
     DeleteBook,
-    WatchBook
+    WatchBook,
+    SelectComponent
   },
   setup() {
 
-    const { getBookList } = UseBook();
+    const { getBookList, searchBookLoading, searchBook } = UseBook();
     const currentPage = ref(Number(router.currentRoute.value.params.page));
     const bookList = ref(1);
+    const bookNameSearch = ref();
+    const bookCategorySearch = ref();
+    const bookAuthorSearch = ref();
+    const statusResetCategory = ref(false);
+    const statusResetAuthor = ref(false);
+    const textSearch = ref('');
 
     const handleGetBookList = () => {
       getBookList(currentPage.value).then(function(response) {
@@ -37,7 +45,11 @@ export default defineComponent({
     handleGetBookList();
     const handleChangePage = (page : number) => {
       currentPage.value = page;
-      handleGetBookList();
+      if (textSearch.value == "") {
+        handleGetBookList();
+      } else {
+        handleSearchBook();
+      }
     }
     const itemBook = ref();
     const selectBook = (item: BookInterface) => {
@@ -45,21 +57,81 @@ export default defineComponent({
     }
 
     const resetItemBook = () => {
-      itemBook.value = null
+      itemBook.value = null;
     }
+
+    const handleSearchBook = () => {
+      if (bookNameSearch.value) {
+        textSearch.value = 'title=' + bookNameSearch.value;
+      }
+
+      if (bookCategorySearch.value) {
+        if (textSearch.value != "") {
+          textSearch.value = textSearch.value + '&';
+        }
+        textSearch.value = textSearch.value + 'category_id=' + bookCategorySearch.value;
+      }
+
+      if (bookAuthorSearch.value) {
+        if (textSearch.value != "") {
+          textSearch.value += '&';
+        }
+        textSearch.value = textSearch.value + 'author_id=' + bookAuthorSearch.value;
+      }
+      searchBook(textSearch.value, currentPage.value).then(response => {
+        bookList.value = response.data.data;
+      }).catch((error) => {
+        searchBookLoading.value = false;
+        notify({
+          title: error?.response?.data?.errors,
+          type: "warn"
+        });
+      }).finally(() => {
+        searchBookLoading.value = false;
+      })
+    }
+    provide("textSearch", textSearch);
+    provide("handleSearchBook", handleSearchBook);
     provide("handleGetBookList", handleGetBookList);
     provide("handleChangePage", handleChangePage);
     provide("resetItemBook", resetItemBook);
+
     return {
       bookList,
       handleChangePage,
+      handleGetBookList,
       selectBook,
-      itemBook
+      searchBook,
+      searchBookLoading,
+      itemBook,
+      bookNameSearch,
+      bookCategorySearch,
+      bookAuthorSearch,
+      statusResetCategory,
+      statusResetAuthor,
+      currentPage,
+      textSearch,
+      handleSearchBook
     }
   },
   methods: {
     formatDate(date: Date) {
       return moment(date).format("HH:mm, DD-MM-YYYY");
+    },
+    searchAuthor(value: any) {
+      this.bookAuthorSearch = value?.id;
+    },
+    searchBookCategory(value: CategoryInterface) {
+      this.bookCategorySearch = value?.id;
+    },
+    resetSearch() {
+      this.statusResetCategory = true;
+      this.statusResetAuthor = true;
+      this.bookNameSearch = '';
+      this.bookAuthorSearch = '';
+      this.bookCategorySearch = '';
+      this.textSearch = '';
+      this.handleGetBookList();
     }
   }
 })
@@ -69,18 +141,48 @@ export default defineComponent({
 <template>
   <div class="book">
     <h4>Danh sách quyển sách</h4>
-
-     <div class="d-flex justify-content-between">
-      <div class="search-Book" style="width: 30%">
+    <div class="row">
+      <div class="col-md-3 col-sm-4 col-12 search-title-book">
         <div class="input-group mb-3">
-          <input type="text" class="form-control-sm form-control rounded-0" placeholder="Nhập tên...">
-          <div class="input-group-append">
-            <button class="btn btn-info rounded-0 btn-sm">Tìm</button>
-          </div>
+          <input type="text" class="form-control-sm form-control" v-model="bookNameSearch" placeholder="Nhập tên sách...">
         </div>
       </div>
-      <div class="add-Book">
-        <button class="btn btn-info btn-sm rounded-0" data-toggle="modal" data-target="#add-update-book-id">Thêm</button>
+
+      <div class="col-md-3 col-sm-4 col-12 search-author-book">
+        <div class="mb-3">
+          <SelectComponent
+            :size="'sm'"
+            :url="'author/search?fullname='"
+            :statusReset="statusResetAuthor"
+            @changeValue="searchAuthor"
+            :text="'Chọn tác giả...'"
+            :variable="'fullname'"  
+          />
+        </div>
+      </div>
+
+      <div class="col-md-3 col-sm-4 col-12 search-category-book">
+        <div class="mb-3">
+          <SelectComponent
+            :size="'sm'"
+            :statusReset="statusResetCategory"
+            :url="'category/search?name='"
+            @changeValue="searchBookCategory"
+            :text="'Chọn loại sách...'"
+            :variable="'name'"  
+          />
+        </div>
+      </div>
+
+      <div class="col-md-2 col-sm-4"> 
+        <button class="btn btn-info btn-sm mr-1" @click="handleSearchBook">
+          <span v-if="searchBookLoading" class="spinner-border spinner-border-sm"/>
+          Lọc
+        </button>
+        <button class="btn btn-secondary btn-sm" @click="resetSearch">Hủy</button>
+      </div>
+      <div class=" col-md-1 col-sm-4 add-Book mb-3 text-right">
+        <button class="btn btn-info btn-sm" data-toggle="modal" data-target="#add-update-book-id">Thêm</button>
       </div>
     </div>
     <div class="table-responsive">
