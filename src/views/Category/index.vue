@@ -97,9 +97,9 @@ export default defineComponent({
   <div class="category">
     <h4>Danh sách loại sách</h4>
 
-    <div class="d-flex justify-content-between">
-      <div class="search-category" style="width: 30%">
-        <div class="input-group mb-3">
+    <div class="row">
+      <div class="col-md-4 col-sm-9 col-12">
+        <div class="input-group mb-2">
           <input type="text" class="form-control-sm form-control" v-model="textSearch" placeholder="Nhập tên...">
           <div class="input-group-append">
             <button class="btn btn-info btn-sm mr-1" @click="handleSearch">
@@ -110,7 +110,7 @@ export default defineComponent({
           <button class="btn btn-secondary btn-sm" @click="cancelSearch">Hủy</button>
         </div>
       </div>
-      <div class="add-category">
+      <div class="col-md-8 col-sm-3 col-12 text-right mb-2">
         <button class="btn btn-info btn-sm rounded-0" data-toggle="modal" data-target="#add-update-category-id">Thêm</button>
       </div>
     </div>
