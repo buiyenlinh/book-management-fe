@@ -226,6 +226,7 @@ export default defineComponent({
                 data-target="#delete-book-id">Xóa</b>
             </td>
           </tr>
+          <div class="p-2" v-if="bookList?.data?.length == 0">Không có dữ liệu</div>
         </tbody>
       </table>
     </div>
