@@ -8,6 +8,7 @@ type category = {
 export default function UseCategory () {
   const addUpdateCategoryLoading = ref(false);
   const deleteCategoryLoading = ref(false);
+  const searchCategoryLoading = ref(false);
 
   const getCategoryList = (page: number) => {
     return API.get(`category?page=${page}`);
@@ -28,8 +29,9 @@ export default function UseCategory () {
     return API.delete(`category/${id}`);
   }
 
-  const getCategoryListSearch = async (text: string) => {
-    return await API.get(`category/search?name=${text}`);
+  const getCategoryListSearch = async (text: string, page: number) => {
+    searchCategoryLoading.value = true;
+    return await API.get(`category/search?name=${text}&page=${page}`);
   }
 
   return {
@@ -39,6 +41,7 @@ export default function UseCategory () {
     updateCategory,
     deleteCategory,
     deleteCategoryLoading,
-    getCategoryListSearch
+    getCategoryListSearch,
+    searchCategoryLoading
   }
 }

@@ -7,17 +7,19 @@ import AddUpdate from "./AddUpdate/index.vue"
 import DeleteCategory from "./DeleteCategory/index.vue"
 import Pagination from "../Components/Pagination/index.vue";
 import router from "../../router"
-
+import { Icon } from '@iconify/vue';
 export default defineComponent({
   components: {
     AddUpdate,
     Pagination,
-    DeleteCategory
+    DeleteCategory,
+    Icon
   },
   setup() {
-    const { getCategoryList } = UseCategory();
+    const { getCategoryList, searchCategoryLoading, getCategoryListSearch } = UseCategory();
     const currentPage = ref(Number(router.currentRoute.value.params.page));
     const categoryList = ref(1);
+    const textSearch = ref('');
     
     const handleGetCategoryList = () => {
       getCategoryList(currentPage.value).then(function(response) {
@@ -32,8 +34,13 @@ export default defineComponent({
     handleGetCategoryList();
     const handleChangePage = (page : number) => {
       currentPage.value = page;
-      handleGetCategoryList();
+      if (textSearch.value == "") {
+        handleGetCategoryList();
+      } else {
+        handleSearch();
+      }
     }
+
     const itemCategory = ref();
     const selectCategory = (item: any) => {
       itemCategory.value = item;
@@ -42,6 +49,23 @@ export default defineComponent({
     const resetItemCategory = () => {
       itemCategory.value = null
     }
+
+    const handleSearch = () => {
+      getCategoryListSearch(textSearch.value, currentPage.value).then(response => {
+        categoryList.value = response.data.data;
+      }).catch(function(error){
+        notify({
+          title: error?.response?.data?.errors,
+          type: "warn"
+        });
+        searchCategoryLoading.value = false;
+      }).finally (() => {
+        searchCategoryLoading.value = false;
+      })
+    }
+
+    provide("textSearch", textSearch);
+    provide("handleSearch", handleSearch);
     provide("handleGetCategoryList", handleGetCategoryList);
     provide("handleChangePage", handleChangePage);
     provide("resetItemCategory", resetItemCategory);
@@ -49,12 +73,20 @@ export default defineComponent({
       categoryList,
       handleChangePage,
       selectCategory,
-      itemCategory
+      itemCategory,
+      textSearch,
+      handleSearch,
+      handleGetCategoryList,
+      searchCategoryLoading
     }
   },
   methods: {
     formatDate(date: Date) {
       return moment(date).format("HH:mm, DD-MM-YYYY");
+    },
+    cancelSearch () {
+      this.textSearch = "";
+      this.handleGetCategoryList();
     }
   }
 })
@@ -68,10 +100,14 @@ export default defineComponent({
     <div class="d-flex justify-content-between">
       <div class="search-category" style="width: 30%">
         <div class="input-group mb-3">
-          <input type="text" class="form-control-sm form-control rounded-0" placeholder="Nhập tên...">
+          <input type="text" class="form-control-sm form-control" v-model="textSearch" placeholder="Nhập tên...">
           <div class="input-group-append">
-            <button class="btn btn-info rounded-0 btn-sm">Tìm</button>
+            <button class="btn btn-info btn-sm mr-1" @click="handleSearch">
+              <span v-if="searchCategoryLoading" class="spinner-border spinner-border-sm"/>
+              <span v-else><Icon icon="bx:bx-search" width="16" /></span>
+            </button>
           </div>
+          <button class="btn btn-secondary btn-sm" @click="cancelSearch">Hủy</button>
         </div>
       </div>
       <div class="add-category">
