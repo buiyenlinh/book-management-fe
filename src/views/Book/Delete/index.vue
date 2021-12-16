@@ -74,13 +74,13 @@ export default defineComponent({
         </div>
         <div class="modal-footer">
           <button type="button"
-            class="btn btn-danger btn-sm rounded-0"
+            class="btn btn-danger btn-sm"
             @click="onSubmit">
             <span v-if="deleteBookLoading" class="spinner-border spinner-border-sm"/>
             Xóa
           </button>
           <button type="button"
-            class="btn btn-secondary btn-sm rounded-0"
+            class="btn btn-secondary btn-sm"
             data-dismiss="modal"
             id="close-modal-book-delete"
             @click="closeModal">Đóng</button>
