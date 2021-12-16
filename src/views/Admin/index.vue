@@ -141,6 +141,7 @@ export default defineComponent({
 <template>
   <div id="admin" :class="changeBars ? 'close-side-bars' : ''">
     <div class="admin d-flex">
+      <div class="admin-bg" @click="handleBars"></div>
       <div class="side-bar">
         <div class="text-light pt-3 pb-3 text-center user-role">
           <img :src="avatar" alt="">
@@ -205,106 +206,16 @@ export default defineComponent({
   </div>
 </template>
 
-<style scoped lang="scss">
-$sideBarWidth : 230px;
-$headerHeight : 50px;
-$sideBarWidthClose: 60px;
-
-.router-link-exact-active {
-  background: #d0cccd;
-  a {
-    color: #252f3b !important;
-  }
-}
-
-#admin, .admin {
-  height: 100%;
-  width: 100%;
-}
-
-.side-bar {
-  width: $sideBarWidth;
-  background: #252f3b;
-  min-height: 100vh;
-  top: 0;
-  position: fixed;
-  left: 0;
-  transition: width ease-in-out 0.4s;
-  .user-role {
-    border-bottom: 1px solid #d0cccd;
-    img {
-      width: 40px;
-      height: 40px;
-      object-fit: cover;
-      border-radius: 50%;
-      border: 1px solid #fff;
-    }
-  }
-  .nav-item {
-    border-bottom: 1px solid #d0cccd;
-    a {
-      color: #fff;
-      display: inline-block;
-      width: $sideBarWidth;
-      padding: 10px 15px 4px 15px;
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-    }
-    a:hover{
-      text-decoration: none;
-    }
-  }
-}
-
-.content {
-  width: calc(100% - $sideBarWidth);
-  margin-left: $sideBarWidth;
-  position: relative;
-  transition: all ease-in-out 0.4s;
-  .content-header {
-    height: $headerHeight;
-    border-bottom: 1px solid #ddd;
-    position: fixed;
-    top: 0;
-    width: calc(100% - $sideBarWidth);
-    background: #fff;
-    z-index: 100;
-    padding: 5px 30px;
-    transition: width ease-in-out 0.4s;
-  }
-  .content-relative {
-    position: relative;
-    height: calc((100% - $headerHeight));
-    width: 100%;
-    .content-absolute {
-      position: absolute;
-      top: $headerHeight;
-      left: 0;
-      width: 100%;
-      min-height: 100vh;
-      padding: 30px;
-      background: #f6f6f6;
-    }
-  }
-}
-
+<style lang="scss" scoped>
 .close-side-bars {
-  .side-bar {
-    width: $sideBarWidthClose;
-    .nav-item {
-      a {
-        width: $sideBarWidthClose;
-      }
-    }
-  }
-  .content {
-    width: calc(100% - $sideBarWidthClose);
-    margin-left: $sideBarWidthClose;
-    .content-header {
-      width: calc(100% - $sideBarWidthClose);
-    }
+  .admin-bg {
+    background: rgba(0, 0, 0, 0.3);
+    width: 100%;
+    height: 100%;
+    position: absolute;
+    left: 0;
+    top: 0;
+    z-index: 105;
   }
 }
-
 </style>
