@@ -15,6 +15,8 @@ export default defineComponent({
     const { deleteCategory, deleteCategoryLoading } = UseCategory();
     const handleGetCategoryList = inject<() => void>("handleGetCategoryList");
     const resetItemCategory = inject<()=> void>("resetItemCategory");
+    const handleSearch = inject<() => void>("handleSearch");
+    const textSearch = inject("textSearch") as any;
 
     const category = ref();
 
@@ -30,8 +32,14 @@ export default defineComponent({
               title: response?.data?.message,
               type: "success"
             });
-            if(handleGetCategoryList) {
-              handleGetCategoryList();
+            if (textSearch.value == "") {
+              if(handleGetCategoryList) {
+                handleGetCategoryList();
+              }
+            } else {
+              if (handleSearch) {
+                handleSearch();
+              }
             }
             document.getElementById("close-modal-delete-category")?.click();
           }).catch(function(error) {

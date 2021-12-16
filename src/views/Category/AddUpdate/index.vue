@@ -14,6 +14,8 @@ export default defineComponent({
     const { addCategory, addUpdateCategoryLoading, updateCategory } = UseCategory();
     const handleGetCategoryList = inject<() => void>("handleGetCategoryList");
     const resetItemCategory = inject<()=> void>("resetItemCategory");
+    const handleSearch = inject<() => void>("handleSearch");
+    const textSearch = inject("textSearch") as any;
 
     const name = ref();
     const error_name = ref("");
@@ -36,9 +38,17 @@ export default defineComponent({
               title: response?.data?.message,
               type: "success"
             });
-            if(handleGetCategoryList) {
-              handleGetCategoryList();
+
+            if (textSearch.value == "") {
+              if(handleGetCategoryList) {
+                handleGetCategoryList();
+              }
+            } else {
+              if (handleSearch) {
+                handleSearch();
+              }
             }
+
             document.getElementById("close-modal-category")?.click();
           }).catch(function(error) {
             addUpdateCategoryLoading.value = false;
@@ -56,8 +66,14 @@ export default defineComponent({
               title: response?.data?.message,
               type: "success"
             });
-            if(handleGetCategoryList) {
-              handleGetCategoryList();
+            if (textSearch.value == "") {
+              if(handleGetCategoryList) {
+                handleGetCategoryList();
+              }
+            } else {
+              if (handleSearch) {
+                handleSearch();
+              }
             }
             document.getElementById("close-modal-category")?.click();
           }).catch(function(error) {
