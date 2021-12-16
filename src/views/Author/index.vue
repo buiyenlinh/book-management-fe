@@ -7,23 +7,26 @@ import Pagination from "../Components/Pagination/index.vue"
 import { AuthorInterface } from "../Type/index"
 import AddUpdateAuthor from "./AddUpdate/index.vue";
 import DeleteAuthor from "./Delete/index.vue";
+import { notify } from "@kyvg/vue3-notification";
+import { Icon } from '@iconify/vue';
 
 export default defineComponent({
   components: {
     Pagination,
     DeleteAuthor,
-    AddUpdateAuthor
+    AddUpdateAuthor,
+    Icon
   },
   setup() {
-    const { getAuthorList } = UseAuthor();
+    const { getAuthorList, getAuthorListSearch, searchAuthorLoading } = UseAuthor();
     const currentPage = ref(Number(router.currentRoute.value.params.page));
     const authorList = ref();
     const authorSelected = ref();
+    const textSearch = ref('');
     
     const handleGetAuthorList = () => {
       getAuthorList(currentPage.value).then(function(response) {
         authorList.value = response.data?.data;
-        console.log(authorList.value);
       }).catch(function(ex) {
         console.log(ex);
       })
@@ -43,6 +46,22 @@ export default defineComponent({
       authorSelected.value = "";
     }
 
+    const handleSearch = () => {  
+      getAuthorListSearch(textSearch.value, currentPage.value).then(response => {
+        authorList.value = response.data?.data;
+      }).catch (error => {
+        searchAuthorLoading.value = false;
+         notify({
+          title: error?.response?.data?.errors,
+          type: "warn"
+        });
+      }).finally (() => {
+        searchAuthorLoading.value = false;
+      })
+    }
+
+    provide("handleSearch", handleSearch);
+    provide("currentPage", currentPage);
     provide("handleGetAuthorList", handleGetAuthorList);
     provide("handleChangePage", handleChangePage);
     provide("resetAuthorSelected", resetAuthorSelected);
@@ -50,12 +69,21 @@ export default defineComponent({
     return {
       authorList,
       selectAuthor,
-      authorSelected
+      authorSelected,
+      textSearch,
+      handleSearch,
+      searchAuthorLoading,
+      handleGetAuthorList,
+      currentPage
     }
   },
   methods: {
     formatDate (date: Date) {
       return moment(date).format('DD-MM-YYYY');
+    },
+    cancelSearch () {
+      this.textSearch = "";
+      this.handleGetAuthorList();
     }
   }
 })
@@ -69,14 +97,18 @@ export default defineComponent({
      <div class="d-flex justify-content-between">
       <div class="search-author" style="width: 30%">
         <div class="input-group mb-3">
-          <input type="text" class="form-control-sm form-control rounded-0" placeholder="Nhập tên...">
+          <input type="text" class="form-control-sm form-control" v-model="textSearch" placeholder="Nhập tên...">
           <div class="input-group-append">
-            <button class="btn btn-info rounded-0 btn-sm">Tìm</button>
+            <button class="btn btn-info btn-sm mr-1" @click="handleSearch">
+              <span v-if="searchAuthorLoading" class="spinner-border spinner-border-sm"/>
+              <span v-else><Icon icon="bx:bx-search" width="16" /></span>
+            </button>
           </div>
+          <button class="btn btn-secondary btn-sm" @click="cancelSearch">Hủy</button>
         </div>
       </div>
       <div class="add-author">
-        <button class="btn btn-info btn-sm rounded-0" data-toggle="modal" data-target="#add-update-author-id">Thêm</button>
+        <button class="btn btn-info btn-sm" data-toggle="modal" data-target="#add-update-author-id">Thêm</button>
       </div>
     </div>
     <div class="table-responsive">
@@ -108,6 +140,7 @@ export default defineComponent({
                 data-target="#delete-author-id">Xóa</b>
             </td>
           </tr>
+          <div class="p-2" v-if="authorList?.data?.length == 0">Không có dữ liệu</div>
         </tbody>
       </table>
     </div>

@@ -14,6 +14,8 @@ export default defineComponent({
     const { addUpdateAuthorLoading, addAuthor, updateAuthor } = UseAuthor();
     const resetAuthorSelected = inject<() => void>("resetAuthorSelected");
     const handleGetAuthorList = inject<() => void>("handleGetAuthorList");
+    const handleSearch = inject<() => void>("handleSearch");
+    const currentPage = inject("currentPage") as any;
     const author = ref();
     const fullname = ref();
     const introduce = ref();
@@ -57,9 +59,16 @@ export default defineComponent({
               type: "success"
             });
             document.getElementById("close-modal-add-update-author")?.click();
-            if (handleGetAuthorList) {
-              handleGetAuthorList();
+            if (currentPage.value == "") {
+              if (handleGetAuthorList) {
+                  handleGetAuthorList();
+              }
+            } else {
+              if (handleSearch) {
+                handleSearch();
+              }
             }
+            
           }).catch(function(error) {
             addUpdateAuthorLoading.value = false;
             notify({

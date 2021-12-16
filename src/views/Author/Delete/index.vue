@@ -13,6 +13,8 @@ export default defineComponent({
     const { deleteAuthor, deleteAuthorLoading } = UseAuthor();
     const author = ref();
     const handleGetAuthorList = inject<() => void>("handleGetAuthorList");
+    const handleSearch = inject<() => void>("handleSearch");
+    const currentPage = inject("currentPage") as any;
     watch(() => props.authorSelected, (newProp, oldProps) => {
       author.value = props.authorSelected;
     })
@@ -26,8 +28,14 @@ export default defineComponent({
             type: "success"
           });
           document.getElementById("close-modal-author-delete")?.click();
-          if(handleGetAuthorList) {
-            handleGetAuthorList();
+          if (currentPage.value == "") {
+            if (handleGetAuthorList) {
+                handleGetAuthorList();
+            }
+          } else {
+            if (handleSearch) {
+              handleSearch();
+            }
           }
         }).catch(function(error) {
           deleteAuthorLoading.value = false;
