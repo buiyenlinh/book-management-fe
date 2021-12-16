@@ -89,6 +89,7 @@ export default {
         <li v-for="(item, i) in list" :key="i">
           <a @click="setValue(item)">{{ item[variable] }}</a>
         </li>
+        <li class="li-no-data" v-if="list?.length == 0">Không có dữ liệu</li>
       </ul>
     </div>
   </div>
@@ -144,6 +145,10 @@ export default {
       cursor: pointer;
     }
 
+    .li-no-data:hover {
+      background: #fff;
+      cursor: auto;
+    }
     li:hover {
       background: #252f3b;
       a {
