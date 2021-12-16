@@ -13,6 +13,8 @@ export default defineComponent({
     const { deleteUser, deleteUserLoading } = UseUser();
     const user = ref();
     const handleGetUserList = inject<() => void>("handleGetUserList");
+    const handleSearch  = inject<() => void>("handleSearch");
+    const textSearch = inject("textSearch") as any;
     watch(() => props.userSelect, (newProp, oldProps) => {
       user.value = props.userSelect;
     })
@@ -26,8 +28,14 @@ export default defineComponent({
             type: "success"
           });
           document.getElementById("close-modal-user-delete")?.click();
-          if(handleGetUserList) {
-            handleGetUserList();
+          if (textSearch.value == "") {
+            if(handleGetUserList) {
+              handleGetUserList();
+            }
+          } else {
+            if (handleSearch) {
+              handleSearch();
+            }
           }
         }).catch(function(error) {
           deleteUserLoading.value = false;
@@ -69,16 +77,16 @@ export default defineComponent({
         </div>
         <div class="modal-footer">
           <button type="button"
-            class="btn btn-info btn-sm rounded-0"
+            class="btn btn-danger btn-sm"
             @click="onSubmit">
             <span v-if="deleteUserLoading" class="spinner-border spinner-border-sm"/>
             Xóa
           </button>
           <button type="button"
-            class="btn btn-secondary btn-sm rounded-0"
+            class="btn btn-secondary btn-sm"
             data-dismiss="modal"
             id="close-modal-user-delete"
-            @click="closeModal">Đóng</button>
+            @click="closeModal">Hủy</button>
         </div>
       </div>
   </div>
