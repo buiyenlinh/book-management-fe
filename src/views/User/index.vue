@@ -10,20 +10,25 @@ import router from "../../router";
 import { BookInterface } from "../Type/index";
 import { base } from "@/services/base";
 import { useStore } from "vuex";
+// import { Icon } from '@iconify/vue';
 
 export default defineComponent({
   components: {
     AddUpdateUser,
     Pagination,
-    DeleteBook
+    DeleteBook,
+    // Icon
   },
   setup() {
     const store = useStore();
-    const { getUserList } = UseUser();
+    const { getUserList, searchUserLoading, searchUser } = UseUser();
     const currentPage = ref(Number(router.currentRoute.value.params.page));
     const userList = ref(1);
     const userSelect = ref();
     const { URL_IMAGE } = base();
+    const textSearch = ref("");
+    const searchFullname = ref("");
+    const searchGender = ref("");
 
     const userRoleLogin = ref();
     watch(() => store.state.user, (newInfo, oldInfo) => {
@@ -44,7 +49,11 @@ export default defineComponent({
     handleGetUserList();
     const handleChangePage = (page : number) => {
       currentPage.value = page;
-      handleGetUserList();
+      if (textSearch.value != "") {
+        handleSearch();
+      } else {
+        handleGetUserList();
+      }
     }
 
     const handleSelectUser = (item: BookInterface) => {
@@ -54,6 +63,35 @@ export default defineComponent({
     const resetUserSelect = () => {
       userSelect.value = null;
     }
+
+    const handleSearch = () => {
+      textSearch.value = "";
+      if (searchFullname.value != "") {
+        textSearch.value += 'fullname=' + searchFullname.value;
+      }
+
+      if (searchGender.value != "") {
+        if (textSearch.value != "") {
+          textSearch.value += "&";
+        }
+        textSearch.value += 'gender=' + searchGender.value;
+      }
+
+      searchUser(textSearch.value, currentPage.value).then(response => {
+        userList.value = response.data.data;
+      }).catch (error => {
+        searchUserLoading.value = false;
+        notify({
+          title: error?.response?.data?.errors,
+          type: "warn"
+        });
+      }).finally (() => {
+        searchUserLoading.value = false;
+      })
+    }
+
+    provide("textSearch", textSearch);
+    provide("handleSearch", handleSearch);
     provide("handleGetUserList", handleGetUserList);
     provide("handleChangePage", handleChangePage);
     provide("userSelect", userSelect);
@@ -64,12 +102,26 @@ export default defineComponent({
       handleSelectUser,
       userSelect,
       URL_IMAGE,
-      userRoleLogin
+      userRoleLogin,
+      handleSearch,
+      textSearch,
+      searchUserLoading,
+      searchFullname,
+      searchGender,
+      handleGetUserList,
+      currentPage
     }
   },
   methods: {
     formatDate(date: Date) {
       return moment(date).format("HH:mm, DD-MM-YYYY");
+    },
+    cancelSearch () {
+      this.textSearch = "";
+      this.searchFullname = "";
+      this.searchGender = "";
+      this.currentPage = 1;
+      this.handleGetUserList();
     }
   }
 })
@@ -79,17 +131,28 @@ export default defineComponent({
 <template>
   <div class="user">
     <h4>Danh sách người dùng</h4>
-     <div class="d-flex justify-content-between">
-      <div class="search-Book" style="width: 30%">
-        <div class="input-group mb-3">
-          <input type="text" class="form-control-sm form-control rounded-0" placeholder="Nhập tên...">
-          <div class="input-group-append">
-            <button class="btn btn-info rounded-0 btn-sm">Tìm</button>
-          </div>
+     <div class="row">
+      <div class="col-md-3 col-sm-6 col-12">
+         <div class="mb-2">
+          <input type="text" class="form-control-sm form-control" v-model="searchFullname" placeholder="Nhập họ tên...">
         </div>
       </div>
-      <div class="add-Book">
-        <button class="btn btn-info btn-sm rounded-0" data-toggle="modal" data-target="#add-update-user-id">Thêm</button>
+      <div class="col-md-3 col-sm-6 col-12 mb-2">
+        <select v-model="searchGender" class="form-control form-control-sm" placeholder="Chọn giới tính...">
+          <option value="F">Nữ</option>
+          <option value="M">Nam</option>
+          <option value="N">N/A</option>
+        </select>
+      </div>
+      <div class="col-md-3 col-sm-6 col-6">
+        <button class="btn btn-info btn-sm mr-1 mb-2" @click="handleSearch">
+          Lọc
+          <span v-if="searchUserLoading" class="spinner-border spinner-border-sm"/>
+        </button>
+        <button class="btn btn-secondary btn-sm mb-2" @click="cancelSearch">Hủy</button>
+      </div>  
+      <div class="col-md-3 col-sm-6 col-6 text-right mb-2">
+        <button class="btn btn-info btn-sm" data-toggle="modal" data-target="#add-update-user-id">Thêm</button>
       </div>
     </div>
     <div class="table-responsive">

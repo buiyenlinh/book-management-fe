@@ -18,6 +18,8 @@ export default defineComponent({
     const store = useStore();
     const handleGetUserList = inject<() => void>("handleGetUserList");
     const resetUserSelect = inject<() => void>("resetUserSelect");
+    const handleSearch  = inject<() => void>("handleSearch");
+    const textSearch = inject("textSearch") as any;
     const { URL_IMAGE } = base();
     const user = ref();
     const username = ref();
@@ -71,12 +73,19 @@ export default defineComponent({
           updateUser(user.value?.id, formData).then(function(response) {
             addUpdateUserLoading.value = true;
             notify({
-                title: response?.data?.message,
-                type: "success"
-              });
-            if(handleGetUserList) {
-              handleGetUserList();
+              title: response?.data?.message,
+              type: "success"
+            });
+            if (textSearch.value == "") {
+              if(handleGetUserList) {
+                handleGetUserList();
+              }
+            } else {
+              if (handleSearch) {
+                handleSearch();
+              }
             }
+            
             document.getElementById("close-modal-user")?.click();
           }).catch(function(error) {
             addUpdateUserLoading.value = false;
@@ -134,8 +143,14 @@ export default defineComponent({
                   title: response?.data?.message,
                   type: "success"
                 });
-              if(handleGetUserList) {
-                handleGetUserList();
+              if (textSearch.value == "") {
+                if(handleGetUserList) {
+                  handleGetUserList();
+                }
+              } else {
+                if (handleSearch) {
+                  handleSearch();
+                }
               }
               document.getElementById("close-modal-user")?.click();
             }).catch(function(error) {
