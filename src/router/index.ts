@@ -1,5 +1,5 @@
 import { createRouter, createWebHistory, RouteRecordRaw } from "vue-router";
-import Home from "../views/PageForUser/Home.vue";
+import Index from "../views/PageForUser/index.vue";
 import Login from "../views/Login/index.vue";
 import Admin from "../views/Admin/index.vue";
 import DashBoard from "../views/DashBoard/index.vue";
@@ -9,12 +9,26 @@ import User from "../views/User/index.vue";
 import NotFound from "../views/Components/NotFound/index.vue";
 import Profile from "../views/Profile/index.vue";
 import Author from "../views/Author/index.vue";
+import Home from "../views/PageForUser/Home/index.vue";
+import Introduce from "../views/PageForUser/Introduce/index.vue";
 
 const routes: Array<RouteRecordRaw> = [
   {
     path: "/",
-    name: "Home",
-    component: Home,
+    name: "Index",
+    component: Index,
+    children: [
+      {
+        path: "",
+        name: "Home",
+        component: Home
+      },
+      {
+        path: "gioi-thieu",
+        name: "Introduce",
+        component: Introduce
+      }
+    ]
   },
   {
     path: "/admin",
