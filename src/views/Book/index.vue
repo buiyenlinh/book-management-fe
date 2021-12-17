@@ -174,14 +174,14 @@ export default defineComponent({
         </div>
       </div>
 
-      <div class="col-md-2 col-sm-4"> 
+      <div class="col-md-2 col-sm-6 col-6"> 
         <button class="btn btn-info btn-sm mr-1" @click="handleSearchBook">
           <span v-if="searchBookLoading" class="spinner-border spinner-border-sm"/>
           Lọc
         </button>
         <button class="btn btn-secondary btn-sm" @click="resetSearch">Hủy</button>
       </div>
-      <div class=" col-md-1 col-sm-4 add-Book mb-3 text-right">
+      <div class=" col-md-1 col-sm-6 col-6 add-Book mb-3 text-right">
         <button class="btn btn-info btn-sm" data-toggle="modal" data-target="#add-update-book-id">Thêm</button>
       </div>
     </div>
