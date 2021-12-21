@@ -1,39 +1,32 @@
 <script lang="ts">
 import { defineComponent, onMounted, provide, ref } from 'vue'
 import UsePageForUser from '../UsePageForUser';
-import Carousel from "../../Components/Carousel/index.vue";
+import 'swiper/swiper-bundle.min.css'
+import SwiperCore, {
+  Autoplay,Pagination,Navigation
+} from 'swiper';
+SwiperCore.use([Autoplay,Pagination,Navigation]);
 
 export default defineComponent({
-  components: {
-    Carousel
-  },
+  name: 'Home',
   setup() {
-    const { getCategory } = UsePageForUser();
-    const currentPage = ref(1);
-    const set_page = ref(4);
+    const { getCategory, getNewBookList } = UsePageForUser();
     const categoryList = ref();
+    const newBookList = ref();
     onMounted(() => {
-      getCategory(set_page.value, currentPage.value).then(response => {
+      getCategory().then(response => {
         categoryList.value = response?.data?.data;
+      })
+
+      getNewBookList(8).then(response => {
+        newBookList.value = response?.data?.data;
+        console.log(newBookList.value);
       })
     });
 
-    const handleChangeCurrentPage = (page: number) => {
-      currentPage.value = page;
-      handleGetCategory();
-    }
-
-    const handleGetCategory = () => {
-      getCategory(set_page.value, currentPage.value).then(response => {
-        categoryList.value = response?.data?.data;
-      })
-    }
-    provide("handleChangeCurrentPage", handleChangeCurrentPage);
-
     return {
       categoryList,
-      set_page,
-      currentPage
+      newBookList
     }
   },
 })
@@ -53,15 +46,22 @@ export default defineComponent({
       <div class="home-category pt-3 pb-3">
         <div class="container">
           <h3 class="title-block">Danh mục sách</h3>
-          <div class="list">
-            <Carousel :set_page="set_page" :list="categoryList" :currentPage="currentPage" />
+          <div class="list">  
+            <ul class="row">
+              <li v-for="(item, index) in categoryList?.data"
+                :key="index"
+                class="col-md-3 col-sm-4 col-6 text-center">
+                <b class="nav-link">{{ item?.name }}</b>
+              </li>
+            </ul>
           </div>
         </div>
       </div>
-      
+
       <div class="home-book-new">
         <div class="container">
           <h3 class="title-block">Sách mới</h3>
+          
           <div class="text-center">
             <button class="btn btn-primary btn-sm">Xem thêm</button>
           </div>

@@ -6,19 +6,27 @@ export default defineComponent({
     const menu = ref([
       {
         label: 'Trang chủ',
-        link: 'Home'
+        link: 'Home',
+        params: {}
       },
       {
         label: 'Giới thiệu',
-        link: 'Introduce'
+        link: 'Introduce',
+        params: {}
       },
       {
         label: 'Sách',
-        link: 'Home'
+        link: 'UserBook',
+        params: {
+          page: 1
+        }
       },
       {
         label: 'Tác giả',
-        link: 'Home'
+        link: 'Home',
+        // params: {
+        //   page: 1
+        // }
       }
     ]);
     return {
@@ -45,8 +53,9 @@ export default defineComponent({
               <div class="col-md-9 col-sm-9 col-12">
                 <div class="menu-main">
                   <ul class="nav justify-content-end" role="tablist">
-                    <li class="nav-item" v-for="(item, index) in menu" :key="index">
-                      <router-link :to="{name: item.link}" class="nav-link">
+                    <li class="nav-item"
+                      v-for="(item, index) in menu" :key="index" >
+                      <router-link :to="{name: item.link, params: {page: item.params?.page}}" class="nav-link">
                         <span>{{ item.label }}</span>
                       </router-link>
                     </li>

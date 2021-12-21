@@ -1,6 +1,7 @@
 <script lang="ts">
 import { defineComponent, inject, watch, ref } from 'vue'
 import { Icon } from '@iconify/vue';
+import { base } from "@/services/base"
 export default defineComponent({
   name: "Carousel",
   components: {
@@ -18,45 +19,28 @@ export default defineComponent({
     currentPage: {
       type: Number,
       default: null
+    },
+    varible: {
+      type: String,
+      default: null
+    },
+    imgText: {
+      type: String,
+      default: null
     }
   },
   setup(props) {
-    const handleChangeCurrentPage = inject<(page: number) => void>("handleChangeCurrentPage");
-    const page = ref(1);
-    
-    setTimeout(() => {
-        if (handleChangeCurrentPage) {
-          handleChangeCurrentPage(page.value + 1);
-        }
-      }, 4000);
-
-    watch(() => props.currentPage, (newPage, oldPage) => {
-      page.value = newPage;
-      setTimeout(() => {
-        if (handleChangeCurrentPage) {
-          if (page.value == props.list?.meta?.last_page) {
-            page.value = 0;
-          }
-          handleChangeCurrentPage(page.value + 1);
-        }
-      }, 4000);
-    })
-
+    const { URL_IMAGE } = base();
     return {
-      handleChangeCurrentPage,
-      page
+      URL_IMAGE
     }
   },
   methods: {
     handlePrePage () {
-      if(this.handleChangeCurrentPage) {
-        this.handleChangeCurrentPage(this.page - 1);
-      }
+      console.log("previous");
     },
     handleNextPage () {
-      if(this.handleChangeCurrentPage) {
-        this.handleChangeCurrentPage(this.page + 1);
-      }
+      console.log("next");
     }
   }
 })
@@ -64,38 +48,47 @@ export default defineComponent({
 
 
 <template>
-<div class="el-carousel">
-  <ul class="row">
-    <li class="col-md-3 col-sm-3 col-6" v-for="(item, index) in list?.data" :key="index">
-      <div class="item text-center">
-        <div class="img">
-          <img src="" alt="">
+  <div class="el-carousel">
+    <ul class="row">
+      <li class="col-md-3 col-sm-3 col-6" v-for="(item, index) in list" :key="index">
+        <div class="item text-center">
+          <div class="img" v-if="imgText">
+            <img :src="URL_IMAGE + item[imgText]" alt="">
+          </div>
+          <div class="text p-2">
+            <div class="name">{{ item[varible] }}</div>
+          </div>
         </div>
-        <div class="text">
-          <div class="name">{{ item?.name }}</div>
-          <Icon icon="akar-icons:circle-chevron-right" />
-        </div>
+      </li>
+    </ul>
+    <div class="redirect">
+      <div class="left">
+        <Icon icon="akar-icons:chevron-left" @click="handlePrePage" />
       </div>
-    </li>
-  </ul>
-  <div class="redirect">
-    <div class="left">
-      <Icon icon="akar-icons:chevron-left" v-if="currentPage > 1" @click="handlePrePage" />
-    </div>
-    <div class="right">
-      <Icon icon="akar-icons:chevron-right" @click="handleNextPage" v-if="currentPage < list?.meta?.last_page" />
+      <div class="right">
+        <Icon icon="akar-icons:chevron-right" @click="handleNextPage" />
+      </div>
     </div>
   </div>
-</div>
-  
 </template>
 
 
 <style lang="scss" scoped>
+
 .el-carousel {
   position: relative;
+  .row {
+   flex-wrap: nowrap;
+   overflow-x: hidden;
+  }
   ul li {
     padding-bottom: 30px;
+    .item img {
+      width: 100%;
+      height: 180px;
+      object-fit: cover;
+      border: 1px solid #ddd;
+    }
   }
 
   .left, .right {
