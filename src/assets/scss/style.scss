@@ -1,3 +1,7 @@
+html {
+  scroll-behavior: smooth;
+}
+
 body {
   .fade {
     pointer-events: none;
@@ -260,7 +264,29 @@ $sideBarWidthClose: 60px;
     text-align: center;
     font-weight: bold;
     text-transform: uppercase;
-    margin-top: 15px;
+    margin: 15px 0px;
   }
   
+
+  /* Chi tiết sách */
+  .details-book {
+    .col-md-9 {
+      border-right: 1px solid #ddd;
+    }
+  }
+
+}
+
+@media screen and (max-width: 850px) {
+  .container {
+    width: 100%;
+  }
+  .details-book {
+    .col-md-9 {
+      border-right: none;
+    }
+    .col-md-3 .right {
+      display: none;
+    }
+  }
 }

@@ -11,6 +11,9 @@ import Profile from "../views/Profile/index.vue";
 import Author from "../views/Author/index.vue";
 import Home from "../views/PageForUser/Home/index.vue";
 import Introduce from "../views/PageForUser/Introduce/index.vue";
+import UserBook from "../views/PageForUser/Books/index.vue";
+import UserCategory from "../views/PageForUser/Category/index.vue";
+import UserDetailBook from "../views/PageForUser/Detail/index.vue"
 
 const routes: Array<RouteRecordRaw> = [
   {
@@ -27,6 +30,21 @@ const routes: Array<RouteRecordRaw> = [
         path: "gioi-thieu",
         name: "Introduce",
         component: Introduce
+      },
+      {
+        path: "sach/page/:page(\\d+)",
+        name: "UserBook",
+        component: UserBook
+      },
+      {
+        path: "danh-muc/:name/:id(\\d+)/trang/:page(\\d+)",
+        name: "UserCategory",
+        component: UserCategory
+      },
+      {
+        path: "chi-tiet/:name/:id(\\d+)",
+        name: "UserDetailBook",
+        component: UserDetailBook
       }
     ]
   },

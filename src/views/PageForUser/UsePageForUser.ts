@@ -1,8 +1,8 @@
 import API from "@/services"
 
 export default function UsePageForUser() {
-  const getCategory = async (set_page: number, page: number) => {
-    return await API.get(`home-user/category?set_page=${set_page}&page=${page}`);
+  const getCategory = async () => {
+    return await API.get(`home-user/category`);
   }
 
   const getBook = async (page: number) => {
@@ -10,12 +10,27 @@ export default function UsePageForUser() {
   }
 
   const getBookByCategory = async (id: number, page: number) => {
-    return await API.get(`home-user/book?category_id=${id}&page=${page}`);
+    return await API.post(`home-user/book-in-category?category_id=${id}&page=${page}`);
+  }
+
+  const getNewBookList = async (total: number) => {
+    return await API.get(`home-user/new-list?total=${total}`);
+  }
+
+  const getSimilarBook = async (set_number: number, id: number) => {
+    return await API.post(`home-user/similar-book?id=${id}&set_number=${set_number}`);
+  }
+
+  const getInfoBook = async (id: number) => {
+    return await API.get(`home-user/book/${id}`);
   }
 
   return {
     getCategory,
     getBook,
-    getBookByCategory
+    getBookByCategory,
+    getNewBookList,
+    getSimilarBook,
+    getInfoBook
   }
 }
