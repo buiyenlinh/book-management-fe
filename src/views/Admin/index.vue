@@ -152,7 +152,7 @@ export default defineComponent({
             class="nav-item"
             :class="item.link==currentName ? 'router-link-exact-active' : ''"
             >
-            <router-link v-if="item?.params?.page" :to="{name: item.link, params: {page: item.params.page} }" :title="item?.label">
+            <router-link v-if="item?.params?.page" :to="{name: item.link, params: {page: item.params?.page} }" :title="item?.label">
               <Icon :icon="item.icon" width="20" class="mb-1" />
               <span class="ml-2">{{ item.label }}</span>
             </router-link>
