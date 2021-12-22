@@ -13,7 +13,7 @@ import Home from "../views/PageForUser/Home/index.vue";
 import Introduce from "../views/PageForUser/Introduce/index.vue";
 import UserBook from "../views/PageForUser/Books/index.vue";
 import UserCategory from "../views/PageForUser/Category/index.vue";
-import UserDetailBook from "../views/PageForUser/Detail/index.vue"
+import UserDetailBook from "../views/PageForUser/Detail/index.vue";
 
 const routes: Array<RouteRecordRaw> = [
   {
@@ -32,7 +32,7 @@ const routes: Array<RouteRecordRaw> = [
         component: Introduce
       },
       {
-        path: "sach/page/:page(\\d+)",
+        path: "sach/trang/:page(\\d+)",
         name: "UserBook",
         component: UserBook
       },
@@ -44,7 +44,7 @@ const routes: Array<RouteRecordRaw> = [
       {
         path: "chi-tiet/:name/:id(\\d+)",
         name: "UserDetailBook",
-        component: UserDetailBook
+        component: UserDetailBook,
       }
     ]
   },
