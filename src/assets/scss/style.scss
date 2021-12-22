@@ -1,3 +1,7 @@
+html {
+  scroll-behavior: smooth;
+}
+
 body {
   .fade {
     pointer-events: none;
@@ -16,105 +20,122 @@ body {
   background-color: #252f3b;
 }
 
-.book, .user, .category, .profile, .author {
-  width: 100%;
-  height: 100%;
-  background: #fff;
-  padding: 15px;
-  border-radius: 5px;
-  box-shadow: 0px 4px 10px 3px rgba(3, 55, 119, 0.15);
-  table thead th {
-    text-transform: capitalize;
-  }
+ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
 }
-
-
-// Side bar
+// Side bar admin
 
 $sideBarWidth : 230px;
 $headerHeight : 50px;
 $sideBarWidthClose: 60px;
 
-.router-link-exact-active {
-  background: #d0cccd;
-  a {
-    color: #252f3b !important;
-  }
-}
 
 #admin, .admin {
   height: 100%;
   width: 100%;
 }
 
-.side-bar {
-  width: $sideBarWidth;
-  background: #252f3b;
-  min-height: 100vh;
-  top: 0;
-  position: fixed;
-  left: 0;
-  transition: all ease-in-out 0.4s;
-  .user-role {
-    border-bottom: 1px solid #d0cccd;
-    img {
-      width: 40px;
-      height: 40px;
-      object-fit: cover;
-      border-radius: 50%;
-      border: 1px solid #fff;
-    }
-  }
-  .nav-item {
-    border-bottom: 1px solid #d0cccd;
+
+.container {
+  width: 1200px;
+  margin: 0 auto;
+}
+
+
+#admin {
+  .router-link-exact-active {
+    background: #d0cccd;
     a {
-      color: #fff;
-      display: inline-block;
-      width: $sideBarWidth;
-      padding: 10px 15px 4px 15px;
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-    }
-    a:hover{
-      text-decoration: none;
+      color: #252f3b !important;
     }
   }
-}
-
-.content {
-  width: calc(100% - $sideBarWidth);
-  margin-left: $sideBarWidth;
-  position: relative;
-  transition: all ease-in-out 0.4s;
-  .content-header {
-    height: $headerHeight;
-    border-bottom: 1px solid #ddd;
-    position: fixed;
-    top: 0;
-    width: calc(100% - $sideBarWidth);
-    background: #fff;
-    z-index: 100;
-    padding: 5px 30px;
-    transition: all ease-in-out 0.4s;
-  }
-  .content-relative {
-    position: relative;
-    height: calc((100% - $headerHeight));
+  .book, .user, .category, .profile, .author {
     width: 100%;
-    .content-absolute {
-      position: absolute;
-      top: $headerHeight;
-      left: 0;
-      width: 100%;
-      min-height: 100vh;
-      padding: 30px;
-      background: #f6f6f6;
+    height: 100%;
+    background: #fff;
+    padding: 15px;
+    border-radius: 5px;
+    box-shadow: 0px 4px 10px 3px rgba(3, 55, 119, 0.15);
+    table thead th {
+      text-transform: capitalize;
     }
   }
+
+  .side-bar {
+    width: $sideBarWidth;
+    background: #252f3b;
+    min-height: 100vh;
+    top: 0;
+    position: fixed;
+    left: 0;
+    transition: all ease-in-out 0.4s;
+    .user-role {
+      border-bottom: 1px solid #d0cccd;
+      img {
+        width: 40px;
+        height: 40px;
+        object-fit: cover;
+        border-radius: 50%;
+        border: 1px solid #fff;
+      }
+    }
+    .nav-item {
+      border-bottom: 1px solid #d0cccd;
+      a {
+        color: #fff;
+        display: inline-block;
+        width: $sideBarWidth;
+        padding: 10px 15px 4px 15px;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+      a:hover{
+        text-decoration: none;
+      }
+    }
+  }
+
+  .content {
+    width: calc(100% - $sideBarWidth);
+    margin-left: $sideBarWidth;
+    position: relative;
+    transition: all ease-in-out 0.4s;
+    .content-header {
+      height: $headerHeight;
+      border-bottom: 1px solid #ddd;
+      position: fixed;
+      top: 0;
+      width: calc(100% - $sideBarWidth);
+      background: #fff;
+      z-index: 100;
+      padding: 5px 30px;
+      transition: all ease-in-out 0.4s;
+    }
+    .content-relative {
+      position: relative;
+      height: calc((100% - $headerHeight));
+      width: 100%;
+      .content-absolute {
+        position: absolute;
+        top: $headerHeight;
+        left: 0;
+        width: 100%;
+        min-height: 100vh;
+        padding: 30px;
+        background: #f6f6f6;
+      }
+    }
+  }
+
 }
 
-.close-side-bars {
+#admin.close-side-bars {
+  .admin-bg {
+    display: none !important;
+  }
   .side-bar {
     width: $sideBarWidthClose;
     .nav-item {
@@ -132,26 +153,33 @@ $sideBarWidthClose: 60px;
   }
 }
 
-@media screen and (max-width: 850px) {
-  .profile-avatar img {
-    width: 150px !important;
-    height: 150px !important;
-  }
 
-  .side-bar {
-    left: -$sideBarWidth;
-    z-index: 110;
-  }
-    
-  .content {
-    width: 100%;
-    margin-left: 0px;
-    .content-header {
+
+@media screen and (max-width: 850px) {
+  #admin {
+    .profile-avatar img {
+      width: 150px !important;
+      height: 150px !important;
+    }
+
+    .side-bar {
+      left: -$sideBarWidth;
+      z-index: 110;
+    }
+      
+    .content {
       width: 100%;
+      margin-left: 0px;
+      .content-header {
+        width: 100%;
+      }
     }
   }
 
-  .close-side-bars {
+  #admin.close-side-bars {
+    .admin-bg {
+      display: block !important;
+    }
     .side-bar {
       left: 0;
       width: $sideBarWidth;
@@ -168,5 +196,97 @@ $sideBarWidthClose: 60px;
       }
     }
   }
+}
 
+
+/* Trang cho người dùng ngoài */
+#home_user {
+  #hu__header {
+    position: relative;
+    max-height: 80px;
+    .hu__header {
+      padding: 10px 0px;
+      background: rgba(0, 0, 0, 0.3);
+      position: fixed;
+      width: 100%;
+      top: 0px;
+      z-index: 10;
+
+      .logo {
+        img {
+          width: 80px;
+          height: auto;
+          object-fit: cover;
+        }
+      }
+      .menu-main {
+        padding-top: 7px;
+      }
+    }
+  }
+
+  #hu__content {
+    margin-top: 80px;
+  }
+ 
+  
+
+  /* Home */
+  #home {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    
+  }
+
+  .home-bg {
+    position: relative;
+    img {
+      width: 100%;
+      height: 700px;
+      object-fit: cover;
+    }
+    .text {
+      position: absolute;
+      top: 40%;
+      left: 10%;
+      z-index: 5;
+      width: 35%;
+      h2 {
+        color: #ddd;
+      }
+    }
+  }
+  
+
+  .title-block {
+    text-align: center;
+    font-weight: bold;
+    text-transform: uppercase;
+    margin: 15px 0px;
+  }
+  
+
+  /* Chi tiết sách */
+  .details-book {
+    .col-md-9 {
+      border-right: 1px solid #ddd;
+    }
+  }
+
+}
+
+@media screen and (max-width: 850px) {
+  .container {
+    width: 100%;
+  }
+  .details-book {
+    .col-md-9 {
+      border-right: none;
+    }
+    .col-md-3 .right {
+      display: none;
+    }
+  }
 }

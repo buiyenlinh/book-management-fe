@@ -157,7 +157,7 @@ export default defineComponent({
               <span class="ml-2">{{ item.label }}</span>
             </router-link>
 
-            <router-link v-else :to="{name: item.link}" :title="item?.label">
+            <router-link  :to="{name: item.link}" :title="item?.label">
               <Icon :icon="item.icon"  width="20" class="mb-1" />
               <span class="ml-2">{{ item.label }}</span>
             </router-link>
@@ -212,7 +212,7 @@ export default defineComponent({
     background: rgba(0, 0, 0, 0.3);
     width: 100%;
     height: 100%;
-    position: absolute;
+    position: fixed;
     left: 0;
     top: 0;
     z-index: 105;
