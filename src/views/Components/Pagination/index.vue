@@ -128,4 +128,8 @@ export default defineComponent({
     background: #d3d0d0;
   }
 }
+
+.page-item.active .page-link {
+  background-color: #007bff !important;
+}
 </style>

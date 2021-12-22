@@ -26,6 +26,11 @@ export default defineComponent({
 
     onMounted(async () => {
       try {
+        const token = localStorage.getItem("token");
+        if (!token) {
+          router.push("/admin/login");
+          localStorage.setItem("token", "");
+        }
         const response = await API.get("profile");
         if (response.data.success) {
           store.dispatch("setUser", response.data.data)
