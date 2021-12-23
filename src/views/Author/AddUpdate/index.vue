@@ -3,6 +3,7 @@ import { AuthorInterface } from '@/views/Type/index'
 import { defineComponent, inject, PropType, ref, watch } from 'vue'
 import UseAuthor from "../UseAuthor";
 import { notify } from "@kyvg/vue3-notification";
+import useFunction from "../../Type/Function"
 
 export default defineComponent({
   props: {
@@ -12,14 +13,17 @@ export default defineComponent({
   },
   setup(props) {
     const { addUpdateAuthorLoading, addAuthor, updateAuthor } = UseAuthor();
+    const { createAlias } = useFunction();
     const resetAuthorSelected = inject<() => void>("resetAuthorSelected");
     const handleGetAuthorList = inject<() => void>("handleGetAuthorList");
     const handleSearch = inject<() => void>("handleSearch");
     const currentPage = inject("currentPage") as any;
     const author = ref();
+    const alias = ref();
     const fullname = ref();
     const introduce = ref();
     const fullname_error = ref();
+    const alias_error = ref();
     const checkFullname = () => {
       if (fullname.value == null || fullname.value == "" || fullname.value == undefined) {
         fullname_error.value = "Họ tên tác giả là bắt buộc";
@@ -28,10 +32,19 @@ export default defineComponent({
       }
     }
 
+    const checkAlias = () => {
+      if (alias.value == null || alias.value == "" || alias.value == undefined) {
+        alias_error.value = "Đường dẫn là bắt buộc";
+      } else {
+        alias_error.value = "";
+      }
+    }
+
     const closeModal = () => {
       fullname_error.value = "";
       fullname.value = "";
       introduce.value = "";
+      alias.value = "";
       if (resetAuthorSelected) {
         resetAuthorSelected();
       }
@@ -41,16 +54,20 @@ export default defineComponent({
       author.value = authorNew;
       fullname.value = author.value?.fullname;
       introduce.value = author.value?.introduce;
+      alias.value = author.value?.alias;
     })
 
     const onSubmit = () => {
       const params = {
         'fullname' : fullname.value,
-        'introduce': introduce.value
+        'introduce': introduce.value,
+        'alias' : alias.value
       }
-      if (fullname.value == null || fullname.value == undefined || fullname.value == "") {
-        fullname_error.value = "Họ tên tác giả là bắt buộc";
-      } else {
+
+      checkFullname();
+      checkAlias();
+
+      if (fullname_error.value == "" && alias_error.value == "") {
         if (author.value?.id) {
           updateAuthor(params, author.value?.id).then(function(response) {
             addUpdateAuthorLoading.value = true;
@@ -111,9 +128,16 @@ export default defineComponent({
       fullname,
       introduce,
       fullname_error,
-      addUpdateAuthorLoading
+      alias, alias_error, checkAlias,
+      addUpdateAuthorLoading,
+      createAlias
     }
   },
+  methods: {
+    handleCreateAlias() {
+      this.alias = this.createAlias(this.fullname);
+    }
+  }
 })
 </script>
 
@@ -130,9 +154,19 @@ export default defineComponent({
             <div class="col-md-12">
               <div class="form-group">
                 <label for=""><b>Họ tên </b><span class="text-danger">*</span></label>
-                <input type="text" class="form-control" v-model="fullname" @keyup="checkFullname">
+                <input type="text" class="form-control" v-model="fullname" @keyup="checkFullname" @blur="handleCreateAlias">
                 <div class="pt-2">
                   <i class="text-danger error" v-if="fullname_error">{{ fullname_error }}</i>
+                </div>
+              </div>
+            </div>
+
+            <div class="col-md-12">
+              <div class="form-group">
+                <label for=""><b>Đường dẫn </b><span class="text-danger">*</span></label>
+                <input type="text" class="form-control" v-model="alias" @keyup="checkAlias">
+                <div class="pt-2">
+                  <i class="text-danger error" v-if="alias_error">{{ alias_error }}</i>
                 </div>
               </div>
             </div>
