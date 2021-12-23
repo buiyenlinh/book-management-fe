@@ -20,6 +20,10 @@ body {
   background-color: #252f3b;
 }
 
+a:hover {
+  text-decoration: none;
+}
+
 ul {
   list-style: none;
   margin: 0;
@@ -206,12 +210,12 @@ $sideBarWidthClose: 60px;
     max-height: 80px;
     .hu__header {
       padding: 10px 0px;
-      background: rgba(0, 0, 0, 0.3);
+      background: rgba(255, 255, 255, 0.6);
       position: fixed;
       width: 100%;
       top: 0px;
       z-index: 10;
-
+      border-bottom: 1px solid #ddd;
       .logo {
         img {
           width: 80px;
@@ -226,19 +230,19 @@ $sideBarWidthClose: 60px;
   }
 
   #hu__content {
-    margin-top: 80px;
+    margin-top: 76px;
   }
  
   
 
   /* Home */
-  #home {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
+  // #home .home {
+  //   position: absolute;
+  //   top: 0;
+  //   left: 0;
+  //   width: 100%;
     
-  }
+  // }
 
   .home-bg {
     position: relative;
@@ -254,7 +258,7 @@ $sideBarWidthClose: 60px;
       z-index: 5;
       width: 35%;
       h2 {
-        color: #ddd;
+        color: #333;
       }
     }
   }

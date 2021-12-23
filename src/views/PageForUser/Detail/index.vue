@@ -3,23 +3,61 @@ import router from '@/router'
 import { defineComponent, onMounted, ref } from 'vue'
 import UsePageForUser from "../UsePageForUser";
 import { base } from "@/services/base";
-
+import CategoryListComponent from "../Component/CategoryList.vue"
+import { Icon } from "@iconify/vue"
 export default defineComponent({
+  components: {
+    CategoryListComponent,
+    Icon
+  },
   setup() {
-    const { getInfoBook } = UsePageForUser();
+    const { getInfoBook, getSimilarBook } = UsePageForUser();
     const { URL_IMAGE } = base();
     const book_id = ref(Number(router.currentRoute.value.params?.id));
     const book = ref();
+    const similarList = ref();
     onMounted(() => {
       getInfoBook(book_id.value).then(response => {
         book.value = response?.data?.data;
       })
+      getSimilarBook(8, book_id.value).then(response => {
+        similarList.value = response?.data?.data;
+      })
     })  
     return {
       book,
-      URL_IMAGE
+      URL_IMAGE,
+      similarList
     }
   },
+  methods: {
+    createString(str: string) {
+      var AccentsMap = [
+        "aàảãáạăằẳẵắặâầẩẫấậ",
+        "AÀẢÃÁẠĂẰẲẴẮẶÂẦẨẪẤẬ",
+        "dđ", "DĐ",
+        "eèẻẽéẹêềểễếệ",
+        "EÈẺẼÉẸÊỀỂỄẾỆ",
+        "iìỉĩíị",
+        "IÌỈĨÍỊ",
+        "oòỏõóọôồổỗốộơờởỡớợ",
+        "OÒỎÕÓỌÔỒỔỖỐỘƠỜỞỠỚỢ",
+        "uùủũúụưừửữứự",
+        "UÙỦŨÚỤƯỪỬỮỨỰ",
+        "yỳỷỹýỵ",
+        "YỲỶỸÝỴ"    
+      ];
+      for (let i=0; i<AccentsMap.length; i++) {
+        let re = new RegExp('[' + AccentsMap[i].substr(1) + ']', 'g');
+        let char = AccentsMap[i][0];
+        str = str.replace(re, char);
+      }
+      str = str.trim();
+      str = str.replace(/\s+/g, '-').toLowerCase();
+      str = str.replace(/[[]&#,+()$~%.'":*?<>{}]/g, '');
+      return str;
+    }
+  }
 })
 </script>
 
@@ -31,58 +69,61 @@ export default defineComponent({
       <div class="row">
         <div class="col-md-9 col-sm-9 col-12">
           <div class="left">
-          <div class="row">
-            <div class="col-md-5 col-sm-5 col-12">
-              <div class="image-cover">
-                <img v-if="book?.cover_image" :src="URL_IMAGE + book?.cover_image" alt="Ảnh bìa sách">
+            <div class="row">
+              <div class="col-md-5 col-sm-5 col-12">
+                <div class="image-cover">
+                  <img v-if="book?.cover_image" :src="URL_IMAGE + book?.cover_image" alt="Ảnh bìa sách">
+                </div>
               </div>
-            </div>
-            <div class="col-md-7 col-sm-7 col-12">
-              <div class="info">
-                <h2 class="text-set-01 book-name">{{ book?.title }}</h2>
-                <p><b>Loại sách:</b> {{ book?.category?.name }}</p>
-                <p><b>Ngôn ngữ:</b> {{ book?.language }}</p>
-                <p class="mb-2">
-                  <b>Tác giả:</b> {{ book?.author?.fullname }}
-                </p>
-                <p><b>Nhà xuất bản:</b> {{ book?.producer }}</p>
-                <p>
-                  <b>Mp3:</b><br>
-                  <audio controls v-if="book?.mp3">
-                    <source :src="URL_IMAGE + book.mp3" type="audio/mpeg">
-                  </audio>
-                </p>
-              </div>
-            </div>
-          </div>
-          
-            <div class="content mt-5 mb-4">
-              <div class="inner">
-                <div class="content-item" v-for="(item, index) in book?.content" :key="index" :id="item?.title">
-                  <h3>Chương / Phần {{ index + 1 }}: {{ item?.title }}</h3>
-                  <p>{{ item?.content }}</p>
-                  <hr>
+              <div class="col-md-7 col-sm-7 col-12">
+                <div class="info">
+                  <h2 class="text-set-01 book-name">{{ book?.title }}</h2>
+                  <p><b>Loại sách:</b> {{ book?.category?.name }}</p>
+                  <p><b>Ngôn ngữ:</b> {{ book?.language }}</p>
+                  <p class="mb-2">
+                    <b>Tác giả:</b> {{ book?.author?.fullname }}
+                  </p>
+                  <p><b>Nhà xuất bản:</b> {{ book?.producer }}</p>
+                  <p><b>Mp3:</b><br></p>
+                  <p>
+                    <audio controls v-if="book?.mp3">
+                      <source :src="URL_IMAGE + book.mp3" type="audio/mpeg">
+                    </audio>
+                  </p>
                 </div>
               </div>
             </div>
-          </div>
-        </div>
-        <div class="col-md-3 col-sm-3">
-          <div class="right">
-            <div class="chapter">
-              <h3 style="font-size: 20px; font-weight: bold">Chương / Phần</h3>
+
+            <div class="chapter-list mt-4">
+              <h3 class="title-h3">Danh sách chương / Phần</h3>
+              <ul class="row">
+                <li v-for="(item, index) in book?.content" :key="index" class="col-md-6 col-sm-6 col-12">
+                  <a :href="'#' + createString(item?.title)">
+                    <Icon icon="grommet-icons:chapter-add" />
+                    {{ item?.title }}
+                  </a>
+                </li>
+              </ul>
+            </div>
+
+            <div class="content mt-5">
+              <h3 class="title-h3">Nội dung</h3>
               <ul>
-                <li v-for="(item, index) in book?.content" :key="index" class="mr-2">
-                  <a :href="'#' + item?.title">{{ item?.title }}</a>
+                <li v-for="(item, index) in book?.content" :key="index" :id="createString(item?.title)">
+                  <p class="text-center pt-4">
+                    <b style="font-size: 25px">{{ item?.title }}</b>
+                  </p>
+                  <p class="content_details">{{ item?.content }}</p>
                 </li>
               </ul>
             </div>
           </div>
         </div>
-      </div>
-
-      <div class="similar-book">
-        <h3 style="font-size: 20px; font-weight: bold">Sách tương tự</h3>
+        <div class="col-md-3 col-sm-3">
+          <div class="right">
+            <CategoryListComponent />
+          </div>
+        </div>
       </div>
     </div>
   </div>
@@ -90,9 +131,22 @@ export default defineComponent({
 
 <style lang="scss" scoped>
 
+.title-h3 {
+  font-size: 20px;
+  font-weight: bold;
+}
+
 .book-name {
   text-transform: capitalize;
   font-weight: bold;
+}
+
+.similar-book {
+  img {
+    width: 100%;
+    height: 250px;
+    object-fit: cover;
+  }
 }
 
 .image-cover img {
@@ -102,5 +156,12 @@ export default defineComponent({
   border: 1px solid #ddd;
 }
 
+.content_details {
+  text-align: justify;
+}
+
+.chapter-list ul li {
+  padding: 7px 20px;
+}
 
 </style>

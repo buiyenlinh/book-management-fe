@@ -4,15 +4,16 @@ import UsePageForUser from "../UsePageForUser"
 import { base } from "@/services/base";
 import Pagination from "../../Components/Pagination/index.vue"
 import router from "@/router"
+import CategoryListComponent from "../Component/CategoryList.vue"
 
 export default defineComponent({
   components: {
-    Pagination
+    Pagination,
+    CategoryListComponent
   },
   setup() {
-    const { getCategory, getBook, getBookByCategory } = UsePageForUser();
+    const { getBook, getBookByCategory } = UsePageForUser();
     const { URL_IMAGE } = base();
-    const categoryList = ref();
     const bookList = ref();
     const category_id = ref();
     const currentPage = ref(Number(router.currentRoute.value.params.page));
@@ -27,9 +28,6 @@ export default defineComponent({
       })
     }
     onMounted(() => {
-      getCategory().then(response => {
-        categoryList.value = response?.data?.data;
-      })
       handleGetBook();
     })
 
@@ -41,7 +39,6 @@ export default defineComponent({
     provide("handleChangePage", handleChangePage);
 
     return {
-      categoryList,
       bookList,
       category_id,
       getBookByCategory,
@@ -88,22 +85,15 @@ export default defineComponent({
 
 
 <template>
-  <div class="hu-book pt-5">
+  <div class="hu-book pt-5 pb-4">
     <div class="container">
       <div class="row">
         <div class="col-md-3 col-sm-4 col-12">
-          <h3>Danh mục sách</h3>
-          <ul>
-            <li v-for="(item, index) in categoryList?.data" :key="index">
-              <router-link :to="{name: 'UserCategory', params: { name: createString(item.name), page: 1, id: item?.id }}" class="nav-link">
-                <span>{{ item.name }}</span>
-              </router-link>
-            </li>
-          </ul>
+          <CategoryListComponent />
         </div>
         <div class="col-md-9 col-sm-8 col-12">
           <ul class="row">
-            <li class="col-md-4 col-sm-6 col-6 mb-2"
+            <li class="col-md-3 col-sm-4 col-6 mb-2"
               v-for="(item, index) in bookList?.data"
               :key="index">
               <router-link :to="{name: 'UserDetailBook', params: { name: createString(item?.title), id: item?.id }}">
@@ -127,7 +117,7 @@ export default defineComponent({
 .item {
   img {
     width: 100%;
-    height: 200px;
+    height: 250px;
     object-fit: cover;
     border: 1px solid #ddd;
   }
