@@ -7,6 +7,7 @@ import { BookInterface, CategoryInterface } from "../../Type/index";
 import { base } from "@/services/base";
 import moment from "moment";
 import SelectComponent from "../../Components/Select/index.vue"
+import useFunction from "../../Type/Function"
 
 type contentType = {
   id: number | null,
@@ -26,6 +27,7 @@ export default defineComponent({
   },
   setup(props) {
     const store = useStore();
+    const { createAlias } = useFunction();
     const { addUpdateBookLoading, addBook, updateBook } = UseBook();
     const handleGetBookList = inject<() => void>("handleGetBookList");
     const resetItemBook = inject<() => void>("resetItemBook");
@@ -44,6 +46,7 @@ export default defineComponent({
     const mp3 = ref();
     const category_id = ref();
     const status = ref(1);
+    const alias = ref();
     const content = ref<contentType[]>([]);
     const categoryList = ref();
     const authorList = ref();
@@ -61,7 +64,8 @@ export default defineComponent({
       content: '',
       mp3: '',
       category_id: '',
-      status: ''
+      status: '',
+      alias: ''
     }); 
 
     const addContent = () => {
@@ -86,6 +90,7 @@ export default defineComponent({
         cover_image.value = newItem?.cover_image;
         producer.value = newItem?.producer;
         author_id.value = newItem?.author?.id;
+        alias.value = newItem?.alias;
         textShowCategory.value = '' + newItem?.category?.name;
         textShowAuthor.value = '' + newItem?.author?.fullname;
         
@@ -108,6 +113,7 @@ export default defineComponent({
 
     const onSubmit = () => {  
       checkTitle();
+      checkAlias();
       checkAuthor();
       checkCategory();
       checkReleaseTime();
@@ -124,7 +130,7 @@ export default defineComponent({
         error.value.status = "";
       }
 
-      if (error.value.title == "" && error.value.author_id == "" && error.value.language == "" && error.value.release_time == "" && error.value.category_id == "" && error.value.status == "" && error.value.mp3 == "" && error.value.cover_image == "") {
+      if (error.value.title == "" && error.value?.alias == "" && error.value.author_id == "" && error.value.language == "" && error.value.release_time == "" && error.value.category_id == "" && error.value.status == "" && error.value.mp3 == "" && error.value.cover_image == "") {
         const formData = new FormData();
         formData.append('title', title.value);
         formData.append('describe', describe.value);
@@ -136,6 +142,7 @@ export default defineComponent({
         formData.append('mp3', mp3.value);
         formData.append('category_id', category_id.value);
         formData.append('status', '' + status.value);
+        formData.append('alias', alias.value);
         formData.append('username', store.state.user.username);
         formData.append('content', JSON.stringify(content.value));
 
@@ -212,6 +219,7 @@ export default defineComponent({
       mp3.value = "";
       category_id.value = "";
       status.value =  1;
+      alias.value = "";
 
       error.value = {
         title: '',
@@ -224,7 +232,8 @@ export default defineComponent({
         content: '',
         mp3: '',
         category_id: '',
-        status: ''
+        status: '',
+        alias: ''
       };
     }
 
@@ -260,6 +269,14 @@ export default defineComponent({
       }
     }
 
+    const checkAlias = () => {
+      if (alias.value == "" || alias.value == null) {
+        error.value.alias = "Đường dẫn là bắt buộc";
+      } else {
+        error.value.alias = "";
+      }
+    }
+
     const checkAuthor = () => {
       if (author_id.value == "" || author_id.value == null || Number(author_id.value) <= 0) {
         error.value.author_id = "Tác giả là bắt buộc";
@@ -284,7 +301,6 @@ export default defineComponent({
       }
     }
 
-
     return {
       searchBookCategory,
       searchAuthor,
@@ -304,9 +320,16 @@ export default defineComponent({
       release_time, cover_image,
       producer, author_id, mp3,
       category_id, status, error,
-      textShowCategory, textShowAuthor
+      textShowCategory, textShowAuthor,
+      checkAlias, alias,
+      createAlias
     }
   },
+  methods: {
+    handleCreateAlias() {
+      this.alias = this.createAlias(this.title);
+    }
+  }
 })
 </script>
 
@@ -323,7 +346,7 @@ export default defineComponent({
             <div class="col-md-6">
               <div class="form-group">
                 <label for=""><b>Tên sách </b><span class="text-danger">*</span></label>
-                <input type="text" class="form-control" v-model="title" @keyup="checkTitle">
+                <input type="text" class="form-control" v-model="title" @keyup="checkTitle" @blur="handleCreateAlias">
                 <div class="pt-2">
                   <i class="text-danger error">{{ error?.title }}</i>
                 </div>
@@ -345,6 +368,16 @@ export default defineComponent({
                 </div>
                 <div class="pt-2">
                   <i class="text-danger error">{{ error?.language }}</i>
+                </div>
+              </div>
+            </div>
+
+            <div class="col-md-6">
+              <div class="form-group">
+                <label for=""><b>Đường dẫn </b><span class="text-danger">*</span></label>
+                <input type="text" class="form-control" v-model="alias" @keyup="checkAlias">
+                <div class="pt-2">
+                  <i class="text-danger error">{{ error?.alias }}</i>
                 </div>
               </div>
             </div>

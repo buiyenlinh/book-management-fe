@@ -29,6 +29,7 @@ export interface BookInterface {
   release_time: string,
   cover_image: string | null,
   producer: string | null,
+  alias: string,
   author: {
       id: number | null,
       fullname: string | null,

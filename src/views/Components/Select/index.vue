@@ -39,14 +39,18 @@ export default {
   },
   methods: {
     search() {
-      this.loading = true;
-      API.get(this.url + this.textSearch).then(response => {
-        this.list = response.data?.data?.data;
-      }).catch(() => {
-        this.loading = false;
-      }).finally(() => {
-        this.loading = false;
-      })
+      if (this.textSearch != '') {
+        this.loading = true;
+        API.get(this.url + this.textSearch).then(response => {
+          this.list = response.data?.data?.data;
+        }).catch(() => {
+          this.loading = false;
+        }).finally(() => {
+          this.loading = false;
+        })
+      } else {
+        this.list = [];
+      }
     },
     setValue(item) {
       this.val = item[this.variable];

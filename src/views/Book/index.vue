@@ -61,6 +61,8 @@ export default defineComponent({
     }
 
     const handleSearchBook = () => {
+      currentPage.value = 1;
+      textSearch.value = "";
       if (bookNameSearch.value) {
         textSearch.value = 'title=' + bookNameSearch.value;
       }
