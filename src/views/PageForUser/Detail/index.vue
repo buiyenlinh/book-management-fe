@@ -110,37 +110,18 @@ export default defineComponent({
               <h3 class="title-h3">Nội dung</h3>
               <ul>
                 <li v-for="(item, index) in book?.content" :key="index" :id="createString(item?.title)">
-                  <p class="text-center">
+                  <p class="text-center pt-4">
                     <b style="font-size: 25px">{{ item?.title }}</b>
                   </p>
-                  <p>{{ item?.content }}</p>
+                  <p class="content_details">{{ item?.content }}</p>
                 </li>
               </ul>
             </div>
-
-            <!-- <div class="similar-book mt-4">
-              <h3 class="title-h3">Sách tương tự</h3>
-              <ul class="row">
-                <li class="col-md-3 col-sm-4 col-6 mb-2" v-for="(item, index) in similarList" :key="index">
-                  <router-link :to="{name: 'UserDetailBook', params: { name: createString(item?.title), id: item?.id }}">
-                    <div class="item text-center">
-                      <img :src="URL_IMAGE + item?.cover_image" alt="">
-                      <div class="p-2">
-                        <span>{{ item?.title }}</span>
-                      </div>
-                    </div>
-                  </router-link>
-                </li>
-              </ul>
-            </div> -->
           </div>
         </div>
         <div class="col-md-3 col-sm-3">
           <div class="right">
-            <div class="chapter">
-              <h3 class="title-h3">Thể loại sách</h3>
-              <CategoryListComponent />
-            </div>
+            <CategoryListComponent />
           </div>
         </div>
       </div>
@@ -175,5 +156,12 @@ export default defineComponent({
   border: 1px solid #ddd;
 }
 
+.content_details {
+  text-align: justify;
+}
+
+.chapter-list ul li {
+  padding: 7px 20px;
+}
 
 </style>

@@ -25,12 +25,22 @@ export default function UsePageForUser() {
     return await API.get(`home-user/book/${id}`);
   }
 
+  const getAuthor = async (page: number) => {
+    return await API.get(`home-user/author?page=${page}`);
+  }
+
+  const getBookByAuthor = async (author_id: number) => {
+    return await API.get(`home-user/book-in-author?author_id=${author_id}`);
+  }
+
   return {
     getCategory,
     getBook,
     getBookByCategory,
     getNewBookList,
     getSimilarBook,
-    getInfoBook
+    getInfoBook,
+    getAuthor,
+    getBookByAuthor
   }
 }

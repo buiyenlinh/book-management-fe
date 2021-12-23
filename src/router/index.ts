@@ -14,7 +14,9 @@ import Introduce from "../views/PageForUser/Introduce/index.vue";
 import UserBook from "../views/PageForUser/Books/index.vue";
 import UserCategory from "../views/PageForUser/Category/index.vue";
 import UserDetailBook from "../views/PageForUser/Detail/index.vue";
-
+import UserAuthor from "../views/PageForUser/Author/index.vue"
+import UserAuthorList from "../views/PageForUser/Author/AuthorList.vue"
+import UserBookAuthor from "../views/PageForUser/Author/BookOfAuthor.vue"
 const routes: Array<RouteRecordRaw> = [
   {
     path: "/",
@@ -30,6 +32,23 @@ const routes: Array<RouteRecordRaw> = [
         path: "gioi-thieu",
         name: "Introduce",
         component: Introduce
+      },
+      {
+        path: "tac-gia",
+        name: "UserAuthor",
+        component: UserAuthor,
+        children: [
+          {
+            path: "trang/:page(\\d+)",
+            name: "UserAuthorList",
+            component: UserAuthorList,
+          },
+          {
+            path: ":name/:id(\\d+)/trang/:page(\\d+)",
+            name: "UserBookAuthor",
+            component: UserBookAuthor,
+          }
+        ]
       },
       {
         path: "sach/trang/:page(\\d+)",

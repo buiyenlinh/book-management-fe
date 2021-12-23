@@ -85,7 +85,6 @@ export default defineComponent({
     <div class="container">
       <div class="row">
         <div class="col-md-3 col-sm-4 col-12">
-          <h3>Thể loại sách</h3>
           <CategoryListComponent />
         </div>
         <div class="col-md-9 col-sm-8 col-12">

@@ -1,7 +1,10 @@
 <script>
 import { defineComponent, ref } from "vue"
-
+import FooterComponent from "./Component/Footer.vue"
 export default defineComponent({
+  components: {
+    FooterComponent
+  },
   setup() {
     const menu = ref([
       {
@@ -23,10 +26,10 @@ export default defineComponent({
       },
       {
         label: 'Tác giả',
-        link: 'Home',
-        // params: {
-        //   page: 1
-        // }
+        link: 'UserAuthorList',
+        params: {
+          page: 1
+        }
       }
     ]);
     return {
@@ -46,7 +49,9 @@ export default defineComponent({
             <div class="row">
               <div class="col-md-3 col-sm-3 col-12">
                 <div class="logo">
-                  <img src="@/assets/images/logo-header-left.png" alt="">
+                  <router-link :to="{ name: 'Home' }">
+                    <img src="@/assets/images/logo-header-left.png" alt="">
+                  </router-link>
                 </div>
               </div>
 
@@ -69,6 +74,7 @@ export default defineComponent({
       <div id="hu__content">
         <router-view></router-view>
       </div>
+      <FooterComponent/>
     </div>
   </div>
 </template>
