@@ -39,29 +39,29 @@ const routes: Array<RouteRecordRaw> = [
         component: UserAuthor,
         children: [
           {
-            path: "trang/:page(\\d+)",
+            path: "trang-:page(\\d+)",
             name: "UserAuthorList",
             component: UserAuthorList,
           },
           {
-            path: ":name/:id(\\d+)/trang/:page(\\d+)",
+            path: ":name/trang-:page(\\d+)",
             name: "UserBookAuthor",
             component: UserBookAuthor,
           }
         ]
       },
       {
-        path: "sach/trang/:page(\\d+)",
+        path: "sach/trang-:page(\\d+)",
         name: "UserBook",
         component: UserBook
       },
       {
-        path: "danh-muc/:name/:id(\\d+)/trang/:page(\\d+)",
+        path: "danh-muc/:name/trang-:page(\\d+)",
         name: "UserCategory",
         component: UserCategory
       },
       {
-        path: "chi-tiet/:name/:id(\\d+)",
+        path: "chi-tiet/:name",
         name: "UserDetailBook",
         component: UserDetailBook,
       }

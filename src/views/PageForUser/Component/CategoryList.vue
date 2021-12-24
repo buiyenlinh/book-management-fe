@@ -23,34 +23,6 @@ export default defineComponent({
       categoryList,
       category_id
     }
-  },
-  methods: {
-    createString(str: string) {
-      var AccentsMap = [
-        "aàảãáạăằẳẵắặâầẩẫấậ",
-        "AÀẢÃÁẠĂẰẲẴẮẶÂẦẨẪẤẬ",
-        "dđ", "DĐ",
-        "eèẻẽéẹêềểễếệ",
-        "EÈẺẼÉẸÊỀỂỄẾỆ",
-        "iìỉĩíị",
-        "IÌỈĨÍỊ",
-        "oòỏõóọôồổỗốộơờởỡớợ",
-        "OÒỎÕÓỌÔỒỔỖỐỘƠỜỞỠỚỢ",
-        "uùủũúụưừửữứự",
-        "UÙỦŨÚỤƯỪỬỮỨỰ",
-        "yỳỷỹýỵ",
-        "YỲỶỸÝỴ"    
-      ];
-      for (let i=0; i<AccentsMap.length; i++) {
-        let re = new RegExp('[' + AccentsMap[i].substr(1) + ']', 'g');
-        let char = AccentsMap[i][0];
-        str = str.replace(re, char);
-      }
-      str = str.trim();
-      str = str.replace(/\s+/g, '-').toLowerCase();
-      str = str.replace(/[[]&#,+()$~%.'":*?<>{}]/g, '');
-      return str;
-    }
   }
 })
 </script>
@@ -60,7 +32,7 @@ export default defineComponent({
   <h3>Thể loại sách</h3>
   <ul>
     <li v-for="(item, index) in categoryList?.data" :key="index">
-      <router-link :to="{name: 'UserCategory', params: { name: createString(item.name), page: 1, id: item.id }}" class="nav-link">
+      <router-link :to="{name: 'UserCategory', params: { name: item?.alias, page: 1 }}" class="nav-link">
         <Icon width="13" icon="akar-icons:circle-check" /> <span>&nbsp; {{ item.name }}</span>
       </router-link>
     </li>

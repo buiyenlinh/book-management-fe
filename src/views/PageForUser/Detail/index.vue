@@ -13,14 +13,15 @@ export default defineComponent({
   setup() {
     const { getInfoBook, getSimilarBook } = UsePageForUser();
     const { URL_IMAGE } = base();
-    const book_id = ref(Number(router.currentRoute.value.params?.id));
+    const book_alias = ref('' + router.currentRoute.value.params?.name);
+
     const book = ref();
     const similarList = ref();
     onMounted(() => {
-      getInfoBook(book_id.value).then(response => {
+      getInfoBook(book_alias.value).then(response => {
         book.value = response?.data?.data;
       })
-      getSimilarBook(8, book_id.value).then(response => {
+      getSimilarBook(8, book_alias.value).then(response => {
         similarList.value = response?.data?.data;
       })
     })  
@@ -28,34 +29,6 @@ export default defineComponent({
       book,
       URL_IMAGE,
       similarList
-    }
-  },
-  methods: {
-    createString(str: string) {
-      var AccentsMap = [
-        "aàảãáạăằẳẵắặâầẩẫấậ",
-        "AÀẢÃÁẠĂẰẲẴẮẶÂẦẨẪẤẬ",
-        "dđ", "DĐ",
-        "eèẻẽéẹêềểễếệ",
-        "EÈẺẼÉẸÊỀỂỄẾỆ",
-        "iìỉĩíị",
-        "IÌỈĨÍỊ",
-        "oòỏõóọôồổỗốộơờởỡớợ",
-        "OÒỎÕÓỌÔỒỔỖỐỘƠỜỞỠỚỢ",
-        "uùủũúụưừửữứự",
-        "UÙỦŨÚỤƯỪỬỮỨỰ",
-        "yỳỷỹýỵ",
-        "YỲỶỸÝỴ"    
-      ];
-      for (let i=0; i<AccentsMap.length; i++) {
-        let re = new RegExp('[' + AccentsMap[i].substr(1) + ']', 'g');
-        let char = AccentsMap[i][0];
-        str = str.replace(re, char);
-      }
-      str = str.trim();
-      str = str.replace(/\s+/g, '-').toLowerCase();
-      str = str.replace(/[[]&#,+()$~%.'":*?<>{}]/g, '');
-      return str;
     }
   }
 })
@@ -98,7 +71,7 @@ export default defineComponent({
               <h3 class="title-h3">Danh sách chương / Phần</h3>
               <ul class="row">
                 <li v-for="(item, index) in book?.content" :key="index" class="col-md-6 col-sm-6 col-12">
-                  <a :href="'#' + createString(item?.title)">
+                  <a :href="'#' + item?.alias">
                     <Icon icon="grommet-icons:chapter-add" />
                     {{ item?.title }}
                   </a>
@@ -109,7 +82,7 @@ export default defineComponent({
             <div class="content mt-5">
               <h3 class="title-h3">Nội dung</h3>
               <ul>
-                <li v-for="(item, index) in book?.content" :key="index" :id="createString(item?.title)">
+                <li v-for="(item, index) in book?.content" :key="index" :id="item?.alias">
                   <p class="text-center pt-4">
                     <b style="font-size: 25px">{{ item?.title }}</b>
                   </p>

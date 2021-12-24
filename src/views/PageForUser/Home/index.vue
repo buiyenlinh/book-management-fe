@@ -29,35 +29,6 @@ export default defineComponent({
       newBookList,
       URL_IMAGE
     }
-  },
-  methods: {
-    createString(str: string | '') {
-      var AccentsMap = [
-        "aàảãáạăằẳẵắặâầẩẫấậ",
-        "AÀẢÃÁẠĂẰẲẴẮẶÂẦẨẪẤẬ",
-        "dđ", "DĐ",
-        "eèẻẽéẹêềểễếệ",
-        "EÈẺẼÉẸÊỀỂỄẾỆ",
-        "iìỉĩíị",
-        "IÌỈĨÍỊ",
-        "oòỏõóọôồổỗốộơờởỡớợ",
-        "OÒỎÕÓỌÔỒỔỖỐỘƠỜỞỠỚỢ",
-        "uùủũúụưừửữứự",
-        "UÙỦŨÚỤƯỪỬỮỨỰ",
-        "yỳỷỹýỵ",
-        "YỲỶỸÝỴ"    
-      ];
-      for (let i=0; i<AccentsMap.length; i++) {
-        let re = new RegExp('[' + AccentsMap[i].substr(1) + ']', 'g');
-        let char = AccentsMap[i][0];
-        str = str.replace(re, char);
-      }
-      str = str.trim();
-      str = str.replace(/\s+/g, '-').toLowerCase();
-      str = str.replace(/[[]&#,+()$~%.'":*?<>{}]/g, '');
-      
-      return str;
-    }
   }
 })
 </script>
@@ -81,7 +52,7 @@ export default defineComponent({
               <li v-for="(item, index) in categoryList?.data"
                 :key="index"
                 class="col-md-3 col-sm-4 col-6">
-                <router-link :to="{name: 'UserCategory', params: { name: createString(item?.name), page: 1, id: item.id }}" class="nav-link">
+                <router-link v-if="item?.alias" :to="{ name: 'UserCategory', params: { name: item.alias, page: 1 }}" class="nav-link">
                   <Icon width="13" icon="akar-icons:circle-check" /> <span>&nbsp; {{ item.name }}</span>
                 </router-link>
               </li>
@@ -95,7 +66,7 @@ export default defineComponent({
           <h3 class="title-block">Sách mới</h3>
           <ul class="row">
             <li class="col-md-3 col-sm-4 col-6" v-for="(item, index) in newBookList" :key="index">
-              <router-link :to="{name: 'UserDetailBook', params: { name: createString(item?.title), id: item?.id }}">
+              <router-link v-if="item?.alias" :to="{name: 'UserDetailBook', params: { name: item?.alias }}">
                 <div class="item text-center">
                   <img :src="URL_IMAGE + item?.cover_image" alt="">
                   <div class="p-3">
@@ -116,7 +87,6 @@ export default defineComponent({
       </div>
     </div>
   </div>
-
 </template>
 <style lang="scss" scoped>
 .home-category {
