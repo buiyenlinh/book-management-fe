@@ -2,13 +2,13 @@
 import { defineComponent, onMounted, provide, ref, watch } from 'vue'
 import UsePageForUser from "../UsePageForUser"
 import { base } from "@/services/base";
-import Pagination from "../../Components/Pagination/index.vue"
+import Pagination2 from "../../Components/Pagination/Pagination.vue"
 import router from "@/router"
 import CategoryListComponent from "../Component/CategoryList.vue"
 
 export default defineComponent({
   components: {
-    Pagination,
+    Pagination2,
     CategoryListComponent
   },
   setup() {
@@ -19,7 +19,7 @@ export default defineComponent({
     const currentPage = ref(Number(router.currentRoute.value.params.page));
 
     watch(router.currentRoute, () => {
-      currentPage.value = Number(router.currentRoute.value.name);
+      currentPage.value = Number(router.currentRoute.value.params.page);
     })
 
     const handleGetBook = () => {
@@ -36,48 +36,13 @@ export default defineComponent({
       handleGetBook();
     }
 
-    provide("handleChangePage", handleChangePage);
-
     return {
       bookList,
       category_id,
       getBookByCategory,
       currentPage,
-      URL_IMAGE
-    }
-  },
-  methods: {
-    handleChangeCategory (value: number) {
-      this.category_id = value;
-      this.getBookByCategory(this.category_id, this.currentPage).then(response => {
-        this.bookList = response?.data?.data;
-      })
-    },
-    createString(str: string) {
-      var AccentsMap = [
-        "aàảãáạăằẳẵắặâầẩẫấậ",
-        "AÀẢÃÁẠĂẰẲẴẮẶÂẦẨẪẤẬ",
-        "dđ", "DĐ",
-        "eèẻẽéẹêềểễếệ",
-        "EÈẺẼÉẸÊỀỂỄẾỆ",
-        "iìỉĩíị",
-        "IÌỈĨÍỊ",
-        "oòỏõóọôồổỗốộơờởỡớợ",
-        "OÒỎÕÓỌÔỒỔỖỐỘƠỜỞỠỚỢ",
-        "uùủũúụưừửữứự",
-        "UÙỦŨÚỤƯỪỬỮỨỰ",
-        "yỳỷỹýỵ",
-        "YỲỶỸÝỴ"    
-      ];
-      for (let i=0; i<AccentsMap.length; i++) {
-        let re = new RegExp('[' + AccentsMap[i].substr(1) + ']', 'g');
-        let char = AccentsMap[i][0];
-        str = str.replace(re, char);
-      }
-      str = str.trim();
-      str = str.replace(/\s+/g, '-').toLowerCase();
-      str = str.replace(/[[]&#,+()$~%.'":*?<>{}]/g, '');
-      return str;
+      URL_IMAGE,
+      handleChangePage
     }
   }
 })
@@ -96,7 +61,7 @@ export default defineComponent({
             <li class="col-md-3 col-sm-4 col-6 mb-2"
               v-for="(item, index) in bookList?.data"
               :key="index">
-              <router-link :to="{name: 'UserDetailBook', params: { name: createString(item?.title), id: item?.id }}">
+              <router-link v-if="item?.alias" :to="{name: 'UserDetailBook', params: { name: item?.alias }}">
                 <div class="item text-center">
                   <img :src="URL_IMAGE + item?.cover_image" alt="">
                   <div class="p-3">
@@ -106,7 +71,7 @@ export default defineComponent({
               </router-link>
             </li>
           </ul>
-          <Pagination :dataProp="bookList?.meta" :nameRoute="'UserBook'"/>
+          <Pagination2 :last_page="bookList?.meta?.last_page" :current_page="currentPage" @change="handleChangePage"/>
         </div>
       </div>
     </div>
