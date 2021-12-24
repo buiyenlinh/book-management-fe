@@ -119,16 +119,16 @@ export default defineComponent({
         <thead style="color: #252f3b">
           <th>Tên loại sách</th>
           <th>Người tạo</th>
+          <th>Đường dẫn</th>
           <th>Thời gian tạo</th>
-          <th>Cập nhật lần cuối</th>
           <th>Thao tác</th>
         </thead>
         <tbody>
           <tr v-for="item in categoryList?.data" :key="item.id">
             <td>{{ item.name }}</td>
             <td>{{ item.username }}</td>
+            <td>{{ item.alias }}</td>
             <td>{{ formatDate(item.created_at) }}</td>
-            <td>{{ formatDate(item.updated_at) }}</td>
             <td>
               <b class="text-info mr-2"
                 style="cursor: pointer"
@@ -163,5 +163,6 @@ export default defineComponent({
     table thead th {
       text-transform: capitalize;
     }
+
   }
 </style>
