@@ -17,7 +17,8 @@ export interface ItemInterface {
 export interface CategoryInterface {
   id: number
   name: string,
-  username: string
+  username: string,
+  alias: string,
   updated_at: string,
   created_at: string
 }

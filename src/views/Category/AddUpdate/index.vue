@@ -3,6 +3,7 @@ import { defineComponent, inject, PropType, ref, watch } from 'vue';
 import UseCategory from "../UseCategory";
 import { notify } from "@kyvg/vue3-notification";
 import { CategoryInterface } from "../../Type/index"
+import useFunction from "../../Type/Function"
 
 export default defineComponent({
   props: {
@@ -11,6 +12,7 @@ export default defineComponent({
     }
   },
   setup(props) {
+    const { createAlias } = useFunction();
     const { addCategory, addUpdateCategoryLoading, updateCategory } = UseCategory();
     const handleGetCategoryList = inject<() => void>("handleGetCategoryList");
     const resetItemCategory = inject<()=> void>("resetItemCategory");
@@ -20,17 +22,20 @@ export default defineComponent({
     const name = ref();
     const error_name = ref("");
     const category = ref();
+    const alias = ref();
+    const error_alias = ref();
 
     watch(() => props.itemCategory, (item, preItem) => {
       category.value = item;
       name.value = category.value?.name;
+      alias.value = item?.alias;
     })
 
     const onSubmit = () => {
-      if (!name.value) {
-        error_name.value = "Tên loại sách là bắt buộc";
-      } else {
-        const params = { 'name' : name.value }
+      checkAlias();
+      checkName();
+      if (error_name.value == "" && error_alias.value == "") {
+        const params = { 'name' : name.value, 'alias' : alias.value }
         if (category.value?.id) {
           updateCategory(category.value?.id, params).then(function(response) {
             addUpdateCategoryLoading.value = true;
@@ -86,7 +91,6 @@ export default defineComponent({
             addUpdateCategoryLoading.value = false;
           })
         }
-        
       }
     }
 
@@ -98,9 +102,19 @@ export default defineComponent({
       }
     }
 
+    const checkAlias = () => {
+      if (!alias.value) {
+        error_alias.value = "Tên loại sách là bắt buộc";
+      } else {
+        error_alias.value = "";
+      }
+    }
+
     const closeModal = () => {
       name.value = "";
       error_name.value = "";
+      alias.value = "";
+      error_alias.value = "";
       category.value = null;
       if (resetItemCategory) {
         resetItemCategory();
@@ -114,9 +128,18 @@ export default defineComponent({
       checkName,
       addUpdateCategoryLoading,
       closeModal,
-      category
+      category,
+      alias,
+      error_alias,
+      checkAlias,
+      createAlias
     }
   },
+  methods: {
+    handleCreateAlias() {
+      this.alias = this.createAlias(this.name);
+    }
+  }
 })
 </script>
 
@@ -132,9 +155,16 @@ export default defineComponent({
           <form action="">
             <div class="form-group">
               <label for="">Tên loại sách <span class="text-danger">*</span></label>
-              <input type="text" class="form-control rounded-0" v-model="name" @keyup="checkName">
+              <input type="text" class="form-control rounded-0" v-model="name" @keyup="checkName" @blur="handleCreateAlias">
               <div class="pt-2">
                 <i class="text-danger">{{ error_name }}</i>
+              </div>
+            </div>
+            <div class="form-group">
+              <label for="">Đường dẫn <span class="text-danger">*</span></label>
+              <input type="text" class="form-control rounded-0" v-model="alias" @keyup="checkAlias">
+              <div class="pt-2">
+                <i class="text-danger">{{ error_alias }}</i>
               </div>
             </div>
           </form>
@@ -156,3 +186,9 @@ export default defineComponent({
     </div>
   </div>
 </template>
+
+<style lang="scss" scoped>
+  .text-danger {
+    font-size: 13px !important;
+  }
+</style>
