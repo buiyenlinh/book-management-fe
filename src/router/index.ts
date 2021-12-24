@@ -17,6 +17,7 @@ import UserDetailBook from "../views/PageForUser/Detail/index.vue";
 import UserAuthor from "../views/PageForUser/Author/index.vue"
 import UserAuthorList from "../views/PageForUser/Author/AuthorList.vue"
 import UserBookAuthor from "../views/PageForUser/Author/BookOfAuthor.vue"
+import UserDetailBookContent from "../views/PageForUser/Detail/Content.vue"
 const routes: Array<RouteRecordRaw> = [
   {
     path: "/",
@@ -64,6 +65,13 @@ const routes: Array<RouteRecordRaw> = [
         path: "chi-tiet/:name",
         name: "UserDetailBook",
         component: UserDetailBook,
+        children: [
+          {
+            path: ':content',
+            name: 'UserDetailBookContent',
+            component: UserDetailBookContent
+          }
+        ]
       }
     ]
   },
