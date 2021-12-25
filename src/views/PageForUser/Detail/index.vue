@@ -71,10 +71,10 @@ export default defineComponent({
               <h3 class="title-h3">Danh sách chương / Phần</h3>
               <ul class="row">
                 <li v-for="(item, index) in book?.content" :key="index" class="col-md-6 col-sm-6 col-12">
-                  <a :href="'#' + item?.alias">
+                  <router-link v-if="item?.alias" :to="{ name: 'UserDetailBookContent', params: { content: item?.alias }}">
                     <Icon icon="grommet-icons:chapter-add" />
                     {{ item?.title }}
-                  </a>
+                  </router-link>
                 </li>
               </ul>
             </div>

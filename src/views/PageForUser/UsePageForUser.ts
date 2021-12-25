@@ -33,6 +33,10 @@ export default function UsePageForUser() {
     return await API.post(`home-user/book-in-author/${alias}?page=${page}`);
   }
 
+  const getContentChapter = async (alias_book: string, alias_content: string) => {
+    return await API.get(`home-user/chapter?book=${alias_book}&alias_content=${alias_content}`);
+  }
+
   return {
     getCategory,
     getBook,
@@ -41,6 +45,7 @@ export default function UsePageForUser() {
     getSimilarBook,
     getInfoBook,
     getAuthor,
-    getBookByAuthor
+    getBookByAuthor,
+    getContentChapter
   }
 }
