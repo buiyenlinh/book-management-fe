@@ -12,7 +12,8 @@ import useFunction from "../../Type/Function"
 type contentType = {
   id: number | null,
   title: string,
-  content: string
+  content: string,
+  alias: string
 }
 
 export default defineComponent({
@@ -69,7 +70,7 @@ export default defineComponent({
     }); 
 
     const addContent = () => {
-      content.value.push({id: null, title: '', content: ''});
+      content.value.push({id: null, title: '', content: '', alias: ''});
     }
 
     const searchBookCategory = (value: CategoryInterface) => {
@@ -328,6 +329,9 @@ export default defineComponent({
   methods: {
     handleCreateAlias() {
       this.alias = this.createAlias(this.title);
+    },
+    handleCreateAliasContent(index:number) {
+      this.content[index].alias = this.createAlias(this.content[index].title);
     }
   }
 })
@@ -514,8 +518,16 @@ export default defineComponent({
               <div class="form-group">
                 <label for=""><b>Phần / Chương </b></label><br>
                 <div class="ml-2 mr-2" v-for="(item, index) in content" :key="index">
-                  <label for="" class="ml-2  mt-3">Tiêu đề {{ index + 1 }}</label>
-                  <input type="text" class="form-control" v-model="content[index].title">
+                  <div class="row">
+                    <div class="col-md-6 col-sm-12 col-">
+                      <label for="" class="ml-2  mt-3">Tiêu đề {{ index + 1 }}</label>
+                      <input type="text" class="form-control" v-model="content[index].title" @blur="handleCreateAliasContent(index)">
+                    </div>
+                    <div class="col-md-6 col-sm-12 col-">
+                      <label for="" class="ml-2  mt-3">Đường dẫn {{ index + 1 }}</label>
+                      <input type="text" class="form-control" v-model="content[index].alias">
+                    </div>
+                  </div> 
                   <label for="" class="ml-2 mt-3">Nội dung {{ index + 1 }}</label>
                   <textarea class="form-control" rows="5" v-model="content[index].content"></textarea>
                 </div>

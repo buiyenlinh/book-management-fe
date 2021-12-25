@@ -41,7 +41,8 @@ export interface BookInterface {
       id: number,
       title: string,
       content: string,
-      book_id: number
+      book_id: number,
+      alias: string
     }
   ],
   mp3: string | null,
