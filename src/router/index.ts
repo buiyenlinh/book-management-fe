@@ -18,6 +18,7 @@ import UserAuthor from "../views/PageForUser/Author/index.vue"
 import UserAuthorList from "../views/PageForUser/Author/AuthorList.vue"
 import UserBookAuthor from "../views/PageForUser/Author/BookOfAuthor.vue"
 import UserDetailBookContent from "../views/PageForUser/Detail/Content.vue"
+import UserLogin from "../views/PageForUser/Login/index.vue"
 const routes: Array<RouteRecordRaw> = [
   {
     path: "/",
@@ -116,6 +117,11 @@ const routes: Array<RouteRecordRaw> = [
     path: "/admin/login",
     name: "Login",
     component: Login,
+  },
+  {
+    path: "/login",
+    name: "UserLogin",
+    component: UserLogin
   },
   {
     path: "/:pathMatch(.*)",

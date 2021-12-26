@@ -1,7 +1,8 @@
 <script>
 import { defineComponent, onMounted, ref } from "vue"
+import API from "@/services"
 import router from "@/router"
-import UseLogin from "./UseLogin"
+import UseUserLogin from "./UseUserLogin"
 import { notify } from "@kyvg/vue3-notification";
 import { Icon } from "@iconify/vue"
 export default defineComponent ({
@@ -9,7 +10,7 @@ export default defineComponent ({
     Icon
   },
   setup() {
-    const { login, loginLoading } = UseLogin();
+    const { login, loginLoading, loginWithGoogle } = UseUserLogin();
     const username = ref("");
     const password = ref("");
     const usernameError = ref("");
@@ -53,11 +54,18 @@ export default defineComponent ({
       }
     };
 
-    onMounted(async() => {
-      if (localStorage.getItem('token')) {
-        router.push({name : 'DashBoard'})
-      }
-    })
+    // onMounted(async() => {
+    //   if (localStorage.getItem('token')) {
+    //     router.push({name : 'DashBoard'})
+    //   }
+    // })
+
+    // const handleLoginWithGoogle = (params) => {
+    //   loginWithGoogle(params).then(response => {
+    //     localStorage.setItem('token', response?.data?.data?.token);
+    //     router.push({ name : 'DashBoard' });
+    //   });
+    // }
 
     return {
       username,
@@ -67,9 +75,31 @@ export default defineComponent ({
       submitForm,
       checkUsername,
       checkPassword,
-      loginLoading
+      loginLoading,
+      API
     }
   },
+  mounted() {
+    window.onSignIn = async function(googleUser) {
+      var profile = googleUser.getBasicProfile();
+      let params = {
+        'email': profile.getEmail(),
+        'fullname': profile.getName(),
+        'oauth2': profile.getId(),
+        'avatar': profile.getImageUrl()
+      };
+      
+      await API.post('auth/login-with-google', params).then(response => {
+        localStorage.setItem('token', response?.data?.data?.token);
+        // router.push({ name : 'Home' });
+      })
+
+      console.log('ID: ' + profile.getId()); // Do not send to your backend! Use an ID token instead.
+      console.log('Name: ' + profile.getName());
+      console.log('Image URL: ' + profile.getImageUrl());
+      console.log('Email: ' + profile.getEmail()); // This is null if the 'email' scope is not present.
+    }
+  }
 })
 
 </script>
@@ -80,7 +110,7 @@ export default defineComponent ({
         <form action="">
           <div class="text-center mb-3">
             <h3 style="font-weight: bold">WELCOME</h3>
-            <p>Vui lòng nhập thông tin pên dưới</p>
+            <p>Vui lòng nhập thông tin bên dưới</p>
           </div>
           
           <div class="mb-3">
@@ -117,6 +147,14 @@ export default defineComponent ({
               <span v-if="loginLoading" class="spinner-border spinner-border-sm"/>
               Đăng nhập
             </button>
+            <p class="text-center pt-3" style="font-size: 14px">Hoặc đăng nhập với</p>
+            <div class="d-flex justify-content-between ml-2 mr-2">
+              <div class="facebook">
+                <Icon icon="logos:facebook" class="mr-2" />
+                <span>Facebook</span>
+              </div>
+              <div class="g-signin2" data-onsuccess="onSignIn"></div>
+            </div>
           </div>
         </form>
       </div>
