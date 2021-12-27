@@ -19,6 +19,9 @@ import UserAuthorList from "../views/PageForUser/Author/AuthorList.vue"
 import UserBookAuthor from "../views/PageForUser/Author/BookOfAuthor.vue"
 import UserDetailBookContent from "../views/PageForUser/Detail/Content.vue"
 import UserLogin from "../views/PageForUser/Login/index.vue"
+import API from "@/services/index"
+import { useStore } from "vuex";
+
 const routes: Array<RouteRecordRaw> = [
   {
     path: "/",
@@ -112,6 +115,9 @@ const routes: Array<RouteRecordRaw> = [
         component: Profile
       }
     ],
+    meta: {
+      requiresAuth: true
+    }
   },
   {
     path: "/admin/login",
@@ -137,5 +143,15 @@ const router = createRouter({
   history: createWebHistory(process.env.BASE_URL),
   routes,
 });
+
+router.beforeEach(async (to, from) => {
+  const store = useStore();
+  const token = localStorage.getItem('token');
+  if (to.meta.requiresAuth) {
+    if (!token) {
+      return { name: "Login" };
+    }
+  }
+})
 
 export default router;

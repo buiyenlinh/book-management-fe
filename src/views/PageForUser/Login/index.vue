@@ -10,7 +10,7 @@ export default defineComponent ({
     Icon
   },
   setup() {
-    const { login, loginLoading, loginWithGoogle } = UseUserLogin();
+    const { login, loginLoading } = UseUserLogin();
     const username = ref("");
     const password = ref("");
     const usernameError = ref("");
@@ -54,18 +54,11 @@ export default defineComponent ({
       }
     };
 
-    // onMounted(async() => {
-    //   if (localStorage.getItem('token')) {
-    //     router.push({name : 'DashBoard'})
-    //   }
-    // })
-
-    // const handleLoginWithGoogle = (params) => {
-    //   loginWithGoogle(params).then(response => {
-    //     localStorage.setItem('token', response?.data?.data?.token);
-    //     router.push({ name : 'DashBoard' });
-    //   });
-    // }
+    onMounted(async() => {
+      if (localStorage.getItem('token')) {
+        router.push({name : 'Home'})
+      }
+    })
 
     return {
       username,
@@ -90,8 +83,9 @@ export default defineComponent ({
       };
       
       await API.post('auth/login-with-google', params).then(response => {
-        localStorage.setItem('token', response?.data?.data?.token);
-        // router.push({ name : 'Home' });
+        console.log(response.data); 
+        localStorage.setItem('token_user', response?.data?.data?.token_user);
+        router.push({ name : 'Home' });
       })
 
       console.log('ID: ' + profile.getId()); // Do not send to your backend! Use an ID token instead.
