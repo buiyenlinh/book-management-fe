@@ -26,14 +26,12 @@ export default defineComponent({
 
     onMounted(async () => {
       try {
-        const token = localStorage.getItem("token");
-        if (!token) {
-          router.push("/admin/login");
-          localStorage.setItem("token", "");
-        }
         const response = await API.get("profile");
         if (response.data.success) {
-          store.dispatch("setUser", response.data.data)
+          if (response.data?.data?.role?.level == 4) {
+            router.push("/");
+          }
+          store.dispatch("setAdmin", response.data.data)
           account.value = response.data.data;
           if (response.data.data?.avatar) {
             avatar.value = URL_IMAGE + response.data.data?.avatar;
