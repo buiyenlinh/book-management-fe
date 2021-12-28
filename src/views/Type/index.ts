@@ -31,6 +31,7 @@ export interface BookInterface {
   cover_image: string | null,
   producer: string | null,
   alias: string,
+  free: number | string |  null,
   author: {
       id: number | null,
       fullname: string | null,
@@ -42,7 +43,8 @@ export interface BookInterface {
       title: string,
       content: string,
       book_id: number,
-      alias: string
+      alias: string,
+      status: number | string |  null,
     }
   ],
   mp3: string | null,
