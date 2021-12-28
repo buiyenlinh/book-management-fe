@@ -13,7 +13,8 @@ type contentType = {
   id: number | null,
   title: string,
   content: string,
-  alias: string
+  alias: string,
+  status: string | number | null,
 }
 
 export default defineComponent({
@@ -47,6 +48,7 @@ export default defineComponent({
     const mp3 = ref();
     const category_id = ref();
     const status = ref(1);
+    const free = ref(1);
     const alias = ref();
     const content = ref<contentType[]>([]);
     const categoryList = ref();
@@ -66,11 +68,12 @@ export default defineComponent({
       mp3: '',
       category_id: '',
       status: '',
+      free: '',
       alias: ''
     }); 
 
     const addContent = () => {
-      content.value.push({id: null, title: '', content: '', alias: ''});
+      content.value.push({id: null, title: '', content: '', alias: '', status: '1'});
     }
 
     const searchBookCategory = (value: CategoryInterface) => {
@@ -101,6 +104,7 @@ export default defineComponent({
         mp3.value = newItem?.mp3;
         category_id.value = newItem?.category?.id;
         status.value = Number(newItem?.status);
+        free.value = Number(newItem?.free);
 
         if (cover_image.value) {
           coverPreview.value = URL_IMAGE + cover_image.value;
@@ -131,7 +135,13 @@ export default defineComponent({
         error.value.status = "";
       }
 
-      if (error.value.title == "" && error.value?.alias == "" && error.value.author_id == "" && error.value.language == "" && error.value.release_time == "" && error.value.category_id == "" && error.value.status == "" && error.value.mp3 == "" && error.value.cover_image == "") {
+      if (free.value != 0 && free.value != 1) {
+        error.value.free = "Phí lựa chọn giá trị không hợp lệ";
+      } else {
+        error.value.free = "";
+      }
+
+      if (error.value.title == "" && error.value?.alias == "" && error.value.author_id == "" && error.value.language == "" && error.value.release_time == "" && error.value.category_id == "" && error.value.status == "" && error.value.free == "" && error.value.mp3 == "" && error.value.cover_image == "") {
         const formData = new FormData();
         formData.append('title', title.value);
         formData.append('describe', describe.value);
@@ -143,6 +153,7 @@ export default defineComponent({
         formData.append('mp3', mp3.value);
         formData.append('category_id', category_id.value);
         formData.append('status', '' + status.value);
+        formData.append('free', '' + free.value);
         formData.append('alias', alias.value);
         formData.append('username', store.state.user.username);
         formData.append('content', JSON.stringify(content.value));
@@ -234,6 +245,7 @@ export default defineComponent({
         mp3: '',
         category_id: '',
         status: '',
+        free: '',
         alias: ''
       };
     }
@@ -320,7 +332,7 @@ export default defineComponent({
       title, describe, language,
       release_time, cover_image,
       producer, author_id, mp3,
-      category_id, status, error,
+      category_id, status, error, free,
       textShowCategory, textShowAuthor,
       checkAlias, alias,
       createAlias
@@ -504,6 +516,25 @@ export default defineComponent({
               </div>
             </div>
 
+            <div class="col-md-6">
+              <div class="form-group">
+                <label for=""><b>Phí: </b><span class="text-danger">*</span></label><br>
+                <div class="form-check-inline">
+                  <label class="form-check-label">
+                    <input type="radio" class="form-check-input" value="1" v-model="free">Miễn phí
+                  </label>
+                </div>
+                <div class="form-check-inline">
+                  <label class="form-check-label">
+                    <input type="radio" class="form-check-input" value="0" v-model="free">Có phí
+                  </label>
+                </div>
+                <div class="pt-2">
+                  <i class="text-danger error">{{ error?.free }}</i>
+                </div>
+              </div>
+            </div>
+
             <div class="col-md-12">
               <div class="form-group">
                 <label for=""><b>Mô tả </b></label>
@@ -517,22 +548,36 @@ export default defineComponent({
             <div class="col-md-12">
               <div class="form-group">
                 <label for=""><b>Phần / Chương </b></label><br>
-                <div class="ml-2 mr-2" v-for="(item, index) in content" :key="index">
+                <div class="ml-2 mr-2 item-chapter" v-for="(item, index) in content" :key="index">
                   <div class="row">
-                    <div class="col-md-6 col-sm-12 col-">
-                      <label for="" class="ml-2  mt-3">Tiêu đề {{ index + 1 }}</label>
+                    <div class="col-md-6 col-sm-12">
+                      <label for="" class="mt-3">Tiêu đề {{ index + 1 }}</label>
                       <input type="text" class="form-control" v-model="content[index].title" @blur="handleCreateAliasContent(index)">
                     </div>
-                    <div class="col-md-6 col-sm-12 col-">
-                      <label for="" class="ml-2  mt-3">Đường dẫn {{ index + 1 }}</label>
+                    <div class="col-md-6 col-sm-12">
+                      <label for="" class="mt-3">Đường dẫn {{ index + 1 }}</label>
                       <input type="text" class="form-control" v-model="content[index].alias">
                     </div>
-                  </div> 
-                  <label for="" class="ml-2 mt-3">Nội dung {{ index + 1 }}</label>
+                  </div>
+                  <div class="d-flex justify-content-between ml-2 mt-3">
+                    <label for="">Nội dung {{ index + 1 }}</label>
+                    <div class="form-group">
+                        <div class="form-check-inline">
+                          <label class="form-check-label">
+                            <input type="radio" class="form-check-input" value="1" v-model="content[index].status">Kích hoạt
+                          </label>
+                        </div>
+                        <div class="form-check-inline">
+                          <label class="form-check-label">
+                            <input type="radio" class="form-check-input" value="0" v-model="content[index].status">Không kích hoạt
+                          </label>
+                        </div>
+                      </div>
+                  </div>
                   <textarea class="form-control" rows="5" v-model="content[index].content"></textarea>
                 </div>
-                <div class="text-center">
-                  <button class="btn btn-info" @click="addContent">+</button>
+                <div class="text-left">
+                  <button class="btn btn-info btn-sm pl-3 pr-3" @click="addContent">+</button>
                 </div>
                 <div class="pt-2">
                   <i class="text-danger error">{{ error?.content }}</i>
@@ -565,4 +610,11 @@ export default defineComponent({
 .error {
   font-size: 12px;
 }
+
+.item-chapter {
+  border: 3px solid #369;
+  padding: 0px 20px 20px;
+  margin-bottom: 20px;
+}
+
 </style>
