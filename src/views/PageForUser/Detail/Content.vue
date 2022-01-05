@@ -3,22 +3,30 @@ import { defineComponent, onMounted, ref, watch } from 'vue'
 import UsePageForUser from "../UsePageForUser";
 import router from "@/router"
 import { Icon } from "@iconify/vue"
+import { useStore } from "vuex";
 export default defineComponent({
   components: {
     Icon
   },
   setup() {
     const { getContentChapter } = UsePageForUser();
+    const store = useStore();
     const data = ref();
     const params = ref(router.currentRoute.value?.params);
-    
+    const isUser = ref();
+
     watch(() => router.currentRoute.value?.params, (newRoute, oldRoute) => {
       params.value = newRoute;
       handleGetContentChapter();
     })
 
+    watch(() => store.state?.user, (newUser, oldUser) => {
+      isUser.value = newUser;
+    })
+
     onMounted(() => {
       handleGetContentChapter();
+      isUser.value = store.state?.user;
     })
 
     const handleGetContentChapter = () => {
@@ -28,7 +36,8 @@ export default defineComponent({
     }
     return {
       data,
-      params
+      params,
+      isUser
     }
   },
 })
@@ -44,7 +53,13 @@ export default defineComponent({
             <router-link v-if="params?.name" :to="{ name: 'UserDetailBook', params: { name: params?.name }}">{{ data?.book?.title }}</router-link>
           </h2>
           <div class="text-center mb-4"><b>{{ data?.content?.title }}</b></div>
-          <p style="text-align: justify">{{ data?.content?.content }}</p>
+          <p style="text-align: justify" v-if="data?.book?.free == 1 || (data?.book?.free == 0 && isUser)">
+            {{ data?.content?.content }}
+          </p>
+          <div class="text-center" v-else>
+            <h3>Vui lòng đăng nhập để đọc sách này</h3>
+            <router-link class="btn btn-primary" :to="{name: 'UserLogin'}" style="display: inline-block">Đăng nhập</router-link>
+          </div>
         </div>
         <div class="col-md-3 col-sm-3 col-12">
           <div class="chapter-list">

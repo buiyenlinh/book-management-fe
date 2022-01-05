@@ -19,8 +19,7 @@ import UserAuthorList from "../views/PageForUser/Author/AuthorList.vue"
 import UserBookAuthor from "../views/PageForUser/Author/BookOfAuthor.vue"
 import UserDetailBookContent from "../views/PageForUser/Detail/Content.vue"
 import UserLogin from "../views/PageForUser/Login/index.vue"
-import API from "@/services/index"
-import { useStore } from "vuex";
+import UserRegister from "../views/PageForUser/Register/index.vue"
 
 const routes: Array<RouteRecordRaw> = [
   {
@@ -130,6 +129,11 @@ const routes: Array<RouteRecordRaw> = [
     component: UserLogin
   },
   {
+    path: "/register",
+    name: "UserRegister",
+    component: UserRegister
+  },
+  {
     path: "/:pathMatch(.*)",
     name: "NotFound",
     meta: {
@@ -145,7 +149,6 @@ const router = createRouter({
 });
 
 router.beforeEach(async (to, from) => {
-  const store = useStore();
   const token = localStorage.getItem('token');
   if (to.meta.requiresAuth) {
     if (!token) {

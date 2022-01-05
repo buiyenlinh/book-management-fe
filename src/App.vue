@@ -1,5 +1,55 @@
+<script>
+import { defineComponent } from 'vue'
+import API from "@/services"
+
+export default defineComponent({
+  data() {
+    return {
+      loading: true,
+      user: null
+    }
+  },
+  methods: {
+    getUser() {
+      let token = localStorage.getItem('token');
+      if (token) {
+        API.get(`home-user/profile`).then(response => {
+          this.setAuth(response.data?.data);
+          this.loading = false;
+        }).catch(err => this.loading = false)
+      } else {
+        this.loading = false;
+      }
+    },
+    setAuth(user) {
+      if (!user) {
+        this.user = null;
+        return;
+      }
+
+      this.user = user;
+    },
+    logout() {
+      if (!confirm('Bạn có muốn thoát tài khoản?')) {
+        return false;
+      }
+
+      // api  thoát
+      this.user = null;
+      localStorage.removeItem('token')
+        
+      return true
+    }
+  },
+  mounted() {
+    this.getUser();
+  }
+})
+</script>
+
 <template>
-  <router-view />
+  <div v-if="loading">Loading...</div>
+  <router-view v-else />
   <notifications position="top center" />
 </template>
 
