@@ -5,6 +5,7 @@ import router from "@/router"
 import UseUserLogin from "./UseUserLogin"
 import { notify } from "@kyvg/vue3-notification";
 import { Icon } from "@iconify/vue"
+
 export default defineComponent ({
   components: {
     Icon
@@ -26,7 +27,7 @@ export default defineComponent ({
         login(values)?.then(function(response) {
           loginLoading.value = true;
           localStorage.setItem('token', response?.data?.data?.token);
-          router.push({ name : 'DashBoard' });
+          router.push({ name : 'Home' });
         }).catch(function(error) {
           loginLoading.value = false;
           notify({
@@ -48,7 +49,7 @@ export default defineComponent ({
     };
     const checkPassword = () => {
       if (!password.value) {
-        passwordError.value = "Tên đăng nhập là bắt buộc";
+        passwordError.value = "Mật khẩu là bắt buộc";
       } else {
         passwordError.value = "";
       }
@@ -72,27 +73,62 @@ export default defineComponent ({
       API
     }
   },
-  mounted() {
-    window.onSignIn = async function(googleUser) {
-      var profile = googleUser.getBasicProfile();
-      let params = {
-        'email': profile.getEmail(),
-        'fullname': profile.getName(),
-        'oauth2': profile.getId(),
-        'avatar': profile.getImageUrl()
-      };
-      
-      await API.post('auth/login-with-google', params).then(response => {
-        console.log(response.data); 
-        localStorage.setItem('token_user', response?.data?.data?.token_user);
-        router.push({ name : 'Home' });
-      })
-
-      console.log('ID: ' + profile.getId()); // Do not send to your backend! Use an ID token instead.
-      console.log('Name: ' + profile.getName());
-      console.log('Image URL: ' + profile.getImageUrl());
-      console.log('Email: ' + profile.getEmail()); // This is null if the 'email' scope is not present.
+  data() {
+    return {
+      auth2: null
     }
+  },
+  methods: {
+    initGoogleApi() {
+      const api = 'https://apis.google.com/js/api:client.js';
+      return new Promise((resolve, reject) => {
+        if (!document.getElementById('google_api')) {
+          let script = document.createElement('script');
+          script.src = api;
+          script.id = 'google_api';
+          script.onreadystatechange = script.onload = () => {
+            if (!script.readyState || /loaded|complete/.test(script.readyState)) {
+              setTimeout(() => {
+                resolve(window.gapi);
+              }, 500)
+            }
+          }
+          document.head.appendChild(script);
+        } else {
+          resolve(window.gapi);
+        }
+      })
+    },
+    googleLogin() {
+      if (!this.auth2) {
+        return;
+      }
+      this.auth2.signIn().then(data => {
+        var profile = data.getBasicProfile();
+        let params = {
+          'email': profile.getEmail(),
+          'fullname': profile.getName(),
+          'oauth2': profile.getId(),
+          'avatar': profile.getImageUrl()
+        };
+        
+        API.post('auth/login-with-google', params).then(response => {
+          let user = response.data.data;
+          localStorage.setItem('token', user.token_user);
+          this.$root.setAuth(user);
+          router.push({ name : 'Home' });
+        })
+      })
+    }
+  },
+  mounted() {
+    this.initGoogleApi().then(gapi => {
+        gapi.load('auth2', () => {
+          this.auth2 = gapi.auth2.init({
+            client_id: '933093091767-n35329fv6bs2gl0krlflspcrjsqa4ebf.apps.googleusercontent.com'
+          });
+        })
+    });
   }
 })
 
@@ -147,7 +183,11 @@ export default defineComponent ({
                 <Icon icon="logos:facebook" class="mr-2" />
                 <span>Facebook</span>
               </div>
-              <div class="g-signin2" data-onsuccess="onSignIn"></div>
+              <div class="facebook" @click="googleLogin()">
+                <Icon icon="logos:facebook" class="mr-2" />
+                <span>Google</span>
+              </div>
+              <div class="g-signin2" data-onsuccess="onSignIn" @click="googleLogin()"></div>
             </div>
           </div>
         </form>

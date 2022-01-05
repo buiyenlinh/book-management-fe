@@ -37,6 +37,10 @@ export default function UsePageForUser() {
     return await API.get(`home-user/chapter?book=${alias_book}&alias_content=${alias_content}`);
   }
 
+  const getProfileUser = async () => {
+    return await API.get(`home-user/profile`);
+  }
+
   return {
     getCategory,
     getBook,
@@ -46,6 +50,7 @@ export default function UsePageForUser() {
     getInfoBook,
     getAuthor,
     getBookByAuthor,
-    getContentChapter
+    getContentChapter,
+    getProfileUser
   }
 }

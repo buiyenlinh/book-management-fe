@@ -1,7 +1,8 @@
 <script lang="ts">
 import { defineComponent, onMounted, provide, ref } from 'vue'
 import UsePageForUser from '../UsePageForUser';
-import { base }  from "@/services/base"
+import { base }  from "@/services/base";
+import { useStore } from "vuex";
 
 import { Icon } from "@iconify/vue";
 export default defineComponent({
@@ -10,7 +11,8 @@ export default defineComponent({
     Icon
   },
   setup() {
-    const { getCategory, getNewBookList } = UsePageForUser();
+    const { getCategory, getNewBookList, getProfileUser } = UsePageForUser();
+    const store = useStore();
     const { URL_IMAGE } = base();
     const categoryList = ref();
     const newBookList = ref();

@@ -5,6 +5,7 @@ import UsePageForUser from "../UsePageForUser";
 import { base } from "@/services/base";
 import CategoryListComponent from "../Component/CategoryList.vue"
 import { Icon } from "@iconify/vue"
+import { useStore } from "vuex";
 export default defineComponent({
   components: {
     CategoryListComponent,
@@ -13,10 +14,12 @@ export default defineComponent({
   setup() {
     const { getInfoBook, getSimilarBook } = UsePageForUser();
     const { URL_IMAGE } = base();
+    const store = useStore();
     const book_alias = ref('' + router.currentRoute.value.params?.name);
     const params_content = ref(router.currentRoute.value.params?.content);
     const book = ref();
     const similarList = ref();
+    const isUser = ref();
 
     watch(() => router.currentRoute.value.params?.content, () => {
       params_content.value = router.currentRoute.value.params?.content;
@@ -28,13 +31,18 @@ export default defineComponent({
       })
       getSimilarBook(8, book_alias.value).then(response => {
         similarList.value = response?.data?.data;
-      })
+      });
     })  
+
+    watch(() => store.state?.user, (newUser, oldUser) => {
+      isUser.value = newUser;
+    })
     return {
       book,
       URL_IMAGE,
       similarList,
-      params_content
+      params_content,
+      isUser
     }
   }
 })

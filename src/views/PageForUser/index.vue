@@ -1,5 +1,5 @@
 <script>
-import { defineComponent, ref } from "vue"
+import { defineComponent, onMounted, ref, watch } from "vue"
 import FooterComponent from "./Component/Footer.vue"
 export default defineComponent({
   components: {
@@ -35,7 +35,7 @@ export default defineComponent({
     return {
       menu
     }
-  },
+  }
 })
 </script>
 
@@ -47,7 +47,7 @@ export default defineComponent({
         <div class="hu__header">
           <div class="container">
             <div class="row">
-              <div class="col-md-3 col-sm-3 col-12">
+              <div class="col-md-2 col-sm-2 col-12">
                 <div class="logo">
                   <router-link :to="{ name: 'Home' }">
                     <img src="@/assets/images/logo-header-left.png" alt="">
@@ -55,7 +55,7 @@ export default defineComponent({
                 </div>
               </div>
 
-              <div class="col-md-9 col-sm-9 col-12">
+              <div class="col-md-7 col-sm-7 col-12">
                 <div class="menu-main">
                   <ul class="nav justify-content-end" role="tablist">
                     <li class="nav-item"
@@ -65,6 +65,27 @@ export default defineComponent({
                       </router-link>
                     </li>
                   </ul>
+                </div>
+              </div>
+              <div class="col-md-3 col-sm-3 col-12 text-right">
+                <div class="nav-item" style="margin-top: 15px">
+                  <div v-if="$root.user">
+                    <div class="dropdown">
+                      <span class="dropdown-toggle" data-toggle="dropdown">
+                        {{ $root.user?.fullname }}
+                      </span>
+                      <div class="dropdown-menu">
+                        <a class="dropdown-item" href="#">
+                          <a @click="$root.logout()">Đăng xuất</a>
+                        </a>
+                        <a class="dropdown-item" href="#">Cá nhân</a>
+                      </div>
+                    </div>
+                  </div>
+                  <div v-else>
+                    <router-link :to="{name: 'UserLogin'}" style="display: inline-block">Đăng nhập</router-link> / 
+                    <router-link :to="{name: 'UserRegister'}"  style="display: inline-block">Đăng ký</router-link>
+                  </div>
                 </div>
               </div>
             </div>
