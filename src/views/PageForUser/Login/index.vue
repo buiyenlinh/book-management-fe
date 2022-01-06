@@ -24,9 +24,10 @@ export default defineComponent ({
         'active' : 1,
       };
       if (username.value && password.value) {
-        login(values)?.then(function(response) {
+        login(values)?.then(response => {
           loginLoading.value = true;
-          localStorage.setItem('token', response?.data?.data?.token);
+          localStorage.setItem('token', response?.data?.data?.token_user);
+          this.$root.setAuth(response);
           router.push({ name : 'Home' });
         }).catch(function(error) {
           loginLoading.value = false;
@@ -81,7 +82,7 @@ export default defineComponent ({
   methods: {
     initGoogleApi() {
       const api = 'https://apis.google.com/js/api:client.js';
-      return new Promise((resolve, reject) => {
+      return new Promise((resolve, reject) => { // resolve sẽ trả về trong then, reject trả về trong catch
         if (!document.getElementById('google_api')) {
           let script = document.createElement('script');
           script.src = api;

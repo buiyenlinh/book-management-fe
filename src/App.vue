@@ -1,8 +1,15 @@
 <script>
 import { defineComponent } from 'vue'
 import API from "@/services"
+import { base } from "@/services/base"
 
 export default defineComponent({
+  setup() {
+    const { URL_IMAGE } = base();
+    return {
+      URL_IMAGE
+    }
+  },
   data() {
     return {
       loading: true,
@@ -16,7 +23,10 @@ export default defineComponent({
         API.get(`home-user/profile`).then(response => {
           this.setAuth(response.data?.data);
           this.loading = false;
-        }).catch(err => this.loading = false)
+          
+        }).catch(err => {
+          this.loading = false;
+        })
       } else {
         this.loading = false;
       }
@@ -39,6 +49,14 @@ export default defineComponent({
       localStorage.removeItem('token')
         
       return true
+    },
+    validateUrl(url) {
+      let regex = /^(http|https)/;
+      if(url.length > 3 && url.match(regex)) {
+        return url;
+      } else {
+        return this.URL_IMAGE + url;
+      }
     }
   },
   mounted() {

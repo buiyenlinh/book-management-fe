@@ -78,7 +78,7 @@ export default defineComponent({
                         <a class="dropdown-item" href="#">
                           <a @click="$root.logout()">Đăng xuất</a>
                         </a>
-                        <a class="dropdown-item" href="#">Cá nhân</a>
+                        <router-link class="dropdown-item" :to="{name: 'UserProfile'}" style="display: inline-block">Cá nhân</router-link>
                       </div>
                     </div>
                   </div>
