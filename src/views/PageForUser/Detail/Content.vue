@@ -13,20 +13,14 @@ export default defineComponent({
     const store = useStore();
     const data = ref();
     const params = ref(router.currentRoute.value?.params);
-    const isUser = ref();
 
     watch(() => router.currentRoute.value?.params, (newRoute, oldRoute) => {
       params.value = newRoute;
       handleGetContentChapter();
     })
 
-    watch(() => store.state?.user, (newUser, oldUser) => {
-      isUser.value = newUser;
-    })
-
     onMounted(() => {
       handleGetContentChapter();
-      isUser.value = store.state?.user;
     })
 
     const handleGetContentChapter = () => {
@@ -36,8 +30,7 @@ export default defineComponent({
     }
     return {
       data,
-      params,
-      isUser
+      params
     }
   },
 })
@@ -53,7 +46,7 @@ export default defineComponent({
             <router-link v-if="params?.name" :to="{ name: 'UserDetailBook', params: { name: params?.name }}">{{ data?.book?.title }}</router-link>
           </h2>
           <div class="text-center mb-4"><b>{{ data?.content?.title }}</b></div>
-          <p style="text-align: justify" v-if="data?.book?.free == 1 || (data?.book?.free == 0 && isUser)">
+          <p style="text-align: justify" v-if="data?.book?.free == 1 || $root.user">
             {{ data?.content?.content }}
           </p>
           <div class="text-center" v-else>

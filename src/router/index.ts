@@ -20,6 +20,7 @@ import UserBookAuthor from "../views/PageForUser/Author/BookOfAuthor.vue"
 import UserDetailBookContent from "../views/PageForUser/Detail/Content.vue"
 import UserLogin from "../views/PageForUser/Login/index.vue"
 import UserRegister from "../views/PageForUser/Register/index.vue"
+import UserProfile from "../views/PageForUser/Profile/index.vue"
 
 const routes: Array<RouteRecordRaw> = [
   {
@@ -75,6 +76,11 @@ const routes: Array<RouteRecordRaw> = [
             component: UserDetailBookContent
           }
         ]
+      },
+      {
+        path: "ca-nhan",
+        name: "UserProfile",
+        component: UserProfile
       }
     ]
   },
