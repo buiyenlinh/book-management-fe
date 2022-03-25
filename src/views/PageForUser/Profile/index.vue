@@ -1,46 +1,95 @@
 <script>
 import { defineComponent, ref } from 'vue'
 import { notify } from "@kyvg/vue3-notification";
+import UsePageForUser from "../UsePageForUser.ts"
+import moment from "moment";
 export default defineComponent({
   setup() {
+    const { deleteAvatarProfile, deleteAvatarLoading, updateProfileUser, updateProfileLoading } = UsePageForUser();
     const username = ref();
     const fullname = ref();
     const birthday = ref();
-    const password = ref();
     const gender = ref('N');
     const address = ref();
     const avatar = ref();
     const avatar_preview = ref();
 
-    const handleChangeAvatar = () => {
-      console.log('handleChangeAvatar');
-    }
-
-    const handleDeleteAvatar = () => {
-      console.log('delete avatar');
-    }
-
     return {
-      handleDeleteAvatar,
-      handleChangeAvatar,
       username,
       fullname,
       birthday,
-      password,
       gender,
       address,
       avatar,
       avatar_preview,
+      deleteAvatarLoading,
+      deleteAvatarProfile,
+      updateProfileUser,
+      updateProfileLoading
     }
   },
   mounted() {
     this.username = this.$root?.user.username;
     this.fullname = this.$root?.user.fullname;
     this.avatar = this.$root?.user.avatar;
-    this.birthday = this.$root?.user.birthday;
+    this.birthday = moment(this.$root?.user.birthday).format("YYYY-MM-DD");
     this.gender = this.$root?.user.gender;
-    this.password = this.$root?.user.password;
     this.address = this.$root?.user.address;
+    this.avatar_preview = this.$root.validateUrl(this.$root.user?.avatar)
+  },
+  methods: {
+    handleDeleteAvatar(){
+      this.deleteAvatarProfile().then(response => {
+        this.deleteAvatarLoading = true;
+        this.avatar = this.$root?.user.avatar;
+        this.avatar_preview = '';
+        this.$root.setAuth(response.data?.data);
+        notify({
+          title: response?.data?.message,
+          type: "success"
+        });
+      }).catch(error => {
+        this.deleteAvatarLoading = false;
+      }).finally (() => {
+        this.deleteAvatarLoading = false;
+      })
+    },
+    handleChangeAvatar(value) {
+      this.avatar = value?.target?.files[0];
+      this.avatar_preview = URL.createObjectURL(value?.target?.files[0]);
+    },
+    onSubmit () {
+      const formData = new FormData();
+      if (this.fullname) {
+        formData.append('fullname', this.fullname);
+      }
+      if (this.address) {
+        formData.append('address', this.address);
+      }
+      if (this.gender) {
+        formData.append('gender', this.gender);
+      }
+      if (this.birthday) {
+        formData.append('birthday', this.birthday);
+      }
+
+      if (this.avatar) {
+        formData.append('avatar', this.avatar);
+      }
+
+      this.updateProfileUser(formData).then(response => {
+        this.$root.setAuth(response.data?.data);
+        this.updateProfileLoading = true;
+        notify({
+          title: response?.data?.message,
+          type: "success"
+        });
+      }).catch(error => {
+        this.updateProfileLoading = false;
+      }).finally(() => {
+        this.updateProfileLoading = false;
+      })
+    }
   }
 })
 </script>
@@ -53,7 +102,7 @@ export default defineComponent({
         <div class="row">
           <div class="col-md-3 col-sm-4 col-12">
             <div class="avatar">
-              <img :src="$root.validateUrl($root.user?.avatar)" alt="Ảnh đại diện">
+              <img :src="avatar_preview" alt="Ảnh đại diện">
             </div>
             <div class="text-center pt-3">
               <button type="button" class="btn btn-info btn-sm" @click="$refs.RefAvatar.click()">
@@ -69,9 +118,6 @@ export default defineComponent({
                 <span v-if="deleteAvatarLoading" class="spinner-border spinner-border-sm"/>
                 Xóa ảnh
               </button>
-              <div class="pt-2">
-                <i class="text-danger error">{{ error?.avatar }}</i>
-              </div>
             </div>
           </div>
           <div class="col-md-9 col-sm-8 col-12">
@@ -82,29 +128,13 @@ export default defineComponent({
                   <div class="form-group">
                     <label for="">Họ tên <span class="text-danger">*</span></label>
                     <input type="text" class="form-control" v-model="fullname" @keyup="checkFullname">
-                    <div class="pt-2">
-                      <i class="text-danger error">{{ error?.fullname }}</i>
-                    </div>
                   </div>
                 </div>
 
                 <div class="col-12 col-md-6 col-sm-12">
                   <div class="form-group">
                     <label for="">Tên đăng nhập <span class="text-danger">*</span></label>
-                    <input type="text" class="form-control" v-model="username" @keyup="checkUsername">
-                    <div class="pt-2">
-                      <i class="text-danger error">{{ error?.username }}</i>
-                    </div>
-                  </div>
-                </div>
-
-                <div class="col-12 col-md-6 col-sm-12">
-                  <div class="form-group">
-                    <label for="">Mật khẩu <span class="text-danger">*</span></label>
-                    <input type="password" class="form-control" v-model="password" @keyup="checkPassword">
-                    <div class="pt-2">
-                      <i class="text-danger error">{{ error?.password }}</i>
-                    </div>
+                    <input type="text" class="form-control" v-model="username" @keyup="checkUsername" disabled>
                   </div>
                 </div>
 
@@ -112,9 +142,6 @@ export default defineComponent({
                   <div class="form-group">
                     <label for="">Địa chỉ <span class="text-danger">*</span></label>
                     <input type="text" class="form-control" v-model="address" @keyup="checkAddress">
-                    <div class="pt-2">
-                      <i class="text-danger error">{{ error?.address }}</i>
-                    </div>
                   </div>
                 </div>
 
@@ -122,9 +149,6 @@ export default defineComponent({
                   <div class="form-group">
                     <label for="">Ngày sinh <span class="text-danger">*</span></label>
                     <input type="date" class="form-control" v-model="birthday" @change="checkBirthday">
-                    <div class="pt-2">
-                      <i class="text-danger error">{{ error?.birthday }}</i>
-                    </div>
                   </div>
                 </div>
 
@@ -145,9 +169,6 @@ export default defineComponent({
                       <label class="form-check-label">
                         <input type="radio" class="form-check-input" value="N" v-model="gender">Khác
                       </label>
-                    </div>
-                    <div class="pt-2">
-                      <i class="text-danger error">{{ error?.gender }}</i>
                     </div>
                   </div>
                 </div>
