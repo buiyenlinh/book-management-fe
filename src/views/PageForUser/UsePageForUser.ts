@@ -1,4 +1,5 @@
 import API from "@/services"
+import { ref } from 'vue'
 
 export default function UsePageForUser() {
   const getCategory = async () => {
@@ -41,6 +42,18 @@ export default function UsePageForUser() {
     return await API.get(`home-user/profile`);
   }
 
+  const deleteAvatarLoading = ref(false);
+  const deleteAvatarProfile =async () => {
+    deleteAvatarLoading.value = true;
+    return await API.delete('home-user/profile/delete-avatar');
+  }
+
+  const updateProfileLoading = ref(false);
+  const updateProfileUser = async(formData: FormData) => {
+    updateProfileLoading.value = true;
+    return await API.post('home-user/profile/update', formData);
+  }
+
   return {
     getCategory,
     getBook,
@@ -51,6 +64,10 @@ export default function UsePageForUser() {
     getAuthor,
     getBookByAuthor,
     getContentChapter,
-    getProfileUser
+    getProfileUser,
+    deleteAvatarProfile,
+    deleteAvatarLoading,
+    updateProfileUser,
+    updateProfileLoading
   }
 }

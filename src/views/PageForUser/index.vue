@@ -1,9 +1,11 @@
 <script>
 import { defineComponent, onMounted, ref, watch } from "vue"
 import FooterComponent from "./Component/Footer.vue"
+import { Icon } from '@iconify/vue';
 export default defineComponent({
   components: {
-    FooterComponent
+    FooterComponent,
+    Icon
   },
   setup() {
     const menu = ref([
@@ -72,7 +74,7 @@ export default defineComponent({
                   <div v-if="$root.user">
                     <div class="dropdown">
                       <span class="dropdown-toggle" data-toggle="dropdown">
-                        {{ $root.user?.fullname }}
+                        <Icon icon="bx:bxs-user-circle" width="25" /> {{ $root.user?.fullname ||  $root.user?.username }}
                       </span>
                       <div class="dropdown-menu">
                         <a class="dropdown-item" href="#">
@@ -100,3 +102,8 @@ export default defineComponent({
   </div>
 </template>
 
+<style scoped>
+.dropdown-menu.show {
+  top: 15px !important;
+}
+</style>
